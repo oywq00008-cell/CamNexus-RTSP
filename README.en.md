@@ -15,8 +15,13 @@ standard way to broadcast the camera feed. CamNexusRTSP runs an RTSP server on t
 itself, encodes the camera image, and streams it out — any RTSP-capable player can watch
 it directly, with no PC relay and nothing uploaded to the cloud.
 
-## Features
+## Screenshots
 
+| Home | Streaming · settings expanded | Onboarding |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/home.jpg" width="240" /> | <img src="docs/screenshots/streaming.jpg" width="240" /> | <img src="docs/screenshots/onboarding.jpg" width="240" /> |
+
+## Features
 ### Video
 
 - Full-screen live preview with resolution, frame rate, and viewer count on the status bar
@@ -61,6 +66,10 @@ vlc rtsp://192.168.1.23:8554/
 
 The default username and password are both `camnexus`; change them in Settings.
 
+> **Want to watch on a PC?** Pair it with [CamNexus](https://github.com/oywq00008-cell/CamNexus),
+> a Windows monitoring hub: add the phone as a channel to view several cameras at once,
+> record, and play back. Also MIT-licensed.
+
 ## Settings
 
 | Setting | Description |
@@ -98,4 +107,5 @@ Runtime dependencies RootEncoder, RTSP-Server, and AndroidX are Apache-2.0;
 see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for details.
 
 The app name and icons are not covered by the MIT license — replace them if you redistribute.
+
 

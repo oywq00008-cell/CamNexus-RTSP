@@ -13,8 +13,13 @@
 CamNexusRTSP 在手机本地跑一个 RTSP 服务，把摄像头画面编码后实时推送出去，
 任何支持 RTSP 的播放器都能直接观看，不需要电脑中转、不上传云端。
 
-## 功能
+## 界面
 
+| 主界面 | 运行中 · 展开设置 | 新手引导 |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/home.jpg" width="240" /> | <img src="docs/screenshots/streaming.jpg" width="240" /> | <img src="docs/screenshots/onboarding.jpg" width="240" /> |
+
+## 功能
 ### 画面
 
 - 全屏实时预览，顶部状态条显示分辨率、帧率、在线客户端数
@@ -58,6 +63,9 @@ vlc rtsp://192.168.1.23:8554/
 
 默认账号密码均为 `camnexus`，可在设置中修改。
 
+> **想在电脑上集中看？** 搭配 [CamNexus](https://github.com/oywq00008-cell/CamNexus) 使用——
+> 它是 Windows 端的监控中枢，把这台手机加入通道即可多路同屏、按需录像与回放，同样 MIT 开源。
+
 ## 设置项
 
 | 设置 | 说明 |
@@ -95,4 +103,5 @@ vlc rtsp://192.168.1.23:8554/
 其版权与许可条款见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
 
 应用名称与图标不属于 MIT 授权范围，二次发布请自行替换。
+
 

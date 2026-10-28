@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CamNexusRTSP</string>
+
+    <string name="state_idle">未开启</string>
+    <string name="state_live">直播中</string>
+    <string name="state_starting">正在启动</string>
+
+    <string name="btn_start">开启服务</string>
+    <string name="btn_stop">停止服务</string>
+
+    <string name="expand_settings">展开设置</string>
+    <string name="collapse_settings">收起设置</string>
+
+    <string name="label_camera">摄像头</string>
+    <string name="label_resolution">分辨率</string>
+    <string name="label_fps">帧率</string>
+    <string name="label_bitrate">码率</string>
+
+    <string name="settings">设置</string>
+    <string name="settings_video">视频</string>
+    <string name="settings_runtime">运行</string>
+    <string name="settings_network">网络</string>
+
+    <string name="label_codec">编码格式</string>
+    <string name="label_encoder">编码器</string>
+    <string name="encoder_auto">自动</string>
+    <string name="encoder_hardware">硬件编码</string>
+    <string name="encoder_software">软件编码</string>
+    <string name="encoder_info_fmt">当前会用：%1$s</string>
+    <string name="encoder_none">本机没有可用的编码器</string>
+    <string name="codec_h265_unsupported">本机没有 H.265 编码器，已保持 H.264</string>
+    <string name="codec_h265_software">只找到软件 H.265 编码器，可能较卡</string>
+    <string name="label_power_saving">省电模式</string>
+    <string name="label_port">RTSP 端口</string>
+    <string name="label_auth">访问验证</string>
+    <string name="label_username">用户名</string>
+    <string name="label_password">密码</string>
+
+    <string name="power_saving_hint">无人观看 60 秒后自动降到低画质；重新开启服务可恢复设定画质</string>
+    <string name="auth_hint">开启后播放器需要输入用户名和密码</string>
+    <string name="restart_hint">修改会立即生效；正在推流时服务会自动重启一次（约 1 秒中断）</string>
+    <string name="codec_hint">H.265 体积更小，但需要手机和播放器都支持</string>
+
+    <string name="diagnose">设备检测</string>
+    <string name="diagnose_title">设备检测</string>
+    <string name="diagnose_device">设备信息</string>
+    <string name="diagnose_recommend">推荐设置</string>
+    <string name="diagnose_apply">应用推荐设置</string>
+    <string name="diagnose_applied">已应用推荐设置</string>
+    <string name="diagnose_hint">推荐值由本机编解码器与相机能力、内存和当前 Wi-Fi 状况算出，可在设置里随时手动调整。</string>
+    <string name="info_soc">处理器</string>
+    <string name="info_architecture">架构</string>
+    <string name="info_ram">内存</string>
+    <string name="info_h264">H.264 编码器</string>
+    <string name="info_h265">H.265 编码器</string>
+    <string name="info_camera">摄像头</string>
+    <string name="info_wifi">网络</string>
+    <string name="unknown">未知</string>
+    <string name="version_fmt">版本 %1$s</string>
+
+    <string name="permission_needed">需要相机和麦克风权限才能开启服务</string>
+    <string name="copied">地址已复制</string>
+    <string name="copy_url">复制地址</string>
+    <string name="open_settings">设置</string>
+    <string name="back">返回</string>
+
+    <string name="msg_invalid_port">端口需在 1024–65535 之间</string>
+    <string name="msg_invalid_auth">用户名或密码不能为空</string>
+    <string name="fps_adjusted">该分辨率最高 %1$d fps，已自动调整</string>
+    <string name="settings_adjusted">该摄像头不支持原分辨率/帧率，已自动调整</string>
+
+    <!-- 新手引导 -->
+    <string name="guide">新手引导</string>
+    <string name="guide_skip">跳过</string>
+    <string name="guide_next">下一步</string>
+    <string name="guide_start">开始使用</string>
+
+    <string name="guide_title_1">CamNexusRTSP</string>
+    <string name="guide_sub_1">把手机变成局域网 RTSP 摄像头\n电脑、平板、NVR 直接拉流观看</string>
+
+    <string name="guide_title_2">界面一目了然</string>
+    <string name="guide_item_2a">顶部状态条</string>
+    <string name="guide_item_2b">实时显示画质、帧率与在线客户端数</string>
+    <string name="guide_item_2c">中间全屏预览</string>
+    <string name="guide_item_2d">铺满整块屏幕，含状态栏与刘海区</string>
+    <string name="guide_item_2e">底部控制卡片</string>
+    <string name="guide_item_2f">一键开关服务，展开可调摄像头、分辨率、帧率、码率</string>
+
+    <string name="guide_title_3">该有的功能都有</string>
+    <string name="guide_item_3a">H.264 / H.265 切换</string>
+    <string name="guide_item_3b">H.265 同画质体积更小，需播放器支持</string>
+    <string name="guide_item_3c">锁屏常驻</string>
+    <string name="guide_item_3d">息屏后继续推流，适合当监控使用</string>
+    <string name="guide_item_3e">省电模式</string>
+    <string name="guide_item_3f">无人观看时自动降低画质，减少发热与耗电</string>
+    <string name="guide_item_3g">访问验证</string>
+    <string name="guide_item_3h">默认账号密码均为 camnexus，可在设置中修改</string>
+
+    <string name="guide_title_4">先授予必要权限</string>
+    <string name="guide_sub_4">相机和麦克风是必需项，通知用于显示常驻状态。</string>
+    <string name="perm_camera">相机</string>
+    <string name="perm_microphone">麦克风</string>
+    <string name="perm_notification">通知</string>
+    <string name="perm_granted">已授予</string>
+    <string name="perm_denied">未授予</string>
+    <string name="perm_grant">授予权限</string>
+    <string name="battery_title">电池优化</string>
+    <string name="battery_ok">已允许后台运行</string>
+    <string name="battery_todo">未设置，锁屏后可能被系统限制</string>
+    <string name="guide_battery_hint">小米 / 华为 / OPPO 等机型还需在系统设置里允许「自启动」和「后台无限制」。</string>
+    <string name="cancel">取消</string>
+    <string name="exit_title">退出 CamNexusRTSP</string>
+    <string name="exit_message">确定要退出吗？正在推流的服务会继续在后台运行。</string>
+    <string name="exit_ok">退出</string>
+    <string name="keepalive_title">后台保活</string>
+    <string name="keepalive_ok">已加入电池优化白名单</string>
+    <string name="keepalive_todo">未加入白名单，息屏后可能被系统清理</string>
+    <string name="keepalive_battery">申请电池优化豁免</string>
+    <string name="keepalive_go">打开应用设置</string>
+    <string name="keepalive_huawei">华为/荣耀：设置 → 电池 → 应用启动管理 → 本应用 → 改为「手动管理」，允许自启动/关联启动/后台活动三项全开。</string>
+    <string name="keepalive_xiaomi">小米/红米：设置 → 应用设置 → 应用管理 → 本应用 → 省电策略 → 无限制；并打开「自启动」。</string>
+    <string name="keepalive_zte">中兴/努比亚：设置 → 应用管理 → 本应用 → 电池 → 允许后台活动；并打开「自启动」。</string>
+    <string name="keepalive_oppo">OPPO/一加/realme：设置 → 电池 → 应用耗电管理 → 本应用 → 允许后台运行。</string>
+    <string name="keepalive_vivo">vivo/iQOO：设置 → 电池 → 后台高耗电 → 允许本应用后台运行。</string>
+    <string name="keepalive_generic">设置 → 应用 → 本应用 → 电池 → 选择「不限制 / 允许后台活动」。</string>
+    <string name="retry_waiting">启动失败，正在重试（%1$d/%2$d）</string>
+    <string name="reconnecting">画面卡住，正在重连…</string>
+    <string name="keepalive_old_system">Android 5.x 没有电池优化白名单，无需设置</string>
+</resources>
+
+
+
+
+
+

@@ -1,0 +1,28 @@
+﻿# 构建产物
+.gradle/
+build/
+app/build/
+dist/
+
+# 本机配置
+local.properties
+keystore.properties
+
+# 签名私钥（绝不入库）
+keystore/
+*.jks
+*.keystore
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# 调试临时文件
+*.log
+u*.xml
+chk*.xml
+
+# 本地开发工具与内部分档（不随仓库分发）
+tools/
+PLAN.md

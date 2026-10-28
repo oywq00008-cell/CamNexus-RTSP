@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="space_1">4dp</dimen>
+    <dimen name="space_2">8dp</dimen>
+
+    <dimen name="radius_card">20dp</dimen>
+    <dimen name="radius_pill">28dp</dimen>
+    <dimen name="radius_input">12dp</dimen>
+    <dimen name="row_height">52dp</dimen>
+</resources>

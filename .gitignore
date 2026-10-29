@@ -26,3 +26,5 @@ chk*.xml
 # 本地开发工具与内部分档（不随仓库分发）
 tools/
 PLAN.md
+clone*.png
+clone*.xml

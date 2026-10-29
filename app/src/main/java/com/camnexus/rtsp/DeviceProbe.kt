@@ -1,4 +1,4 @@
-﻿package com.camnexus.rtsp
+package com.camnexus.rtsp
 
 import android.app.ActivityManager
 import android.content.Context
@@ -43,7 +43,9 @@ object DeviceProbe {
         val am = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
         val memoryInfo = ActivityManager.MemoryInfo()
         am?.getMemoryInfo(memoryInfo)
-        val ramMb = memoryInfo.totalMem / (1024 * 1024)
+        // 部分定制 ROM / 山寨机会让 totalMem 返回 0，回退到 /proc/meminfo
+        val apiRamMb = memoryInfo.totalMem / (1024 * 1024)
+        val ramMb = if (apiRamMb > 0) apiRamMb else memTotalMb()
         val lowRam = am?.isLowRamDevice ?: (ramMb < 2048)
 
         val sizes = CameraCaps.resolutions(context, cameraId)
@@ -70,6 +72,19 @@ object DeviceProbe {
             wifiRssi = rssi
         )
     }
+
+    /** ActivityManager 在某些定制 ROM 上会返回 0，直接读 /proc/meminfo 兜底。 */
+    private fun memTotalMb(): Long = runCatching {
+        java.io.File("/proc/meminfo").useLines { lines ->
+            lines.firstOrNull { it.startsWith("MemTotal:") }
+                ?.trim()
+                ?.split(Regex("\\s+"))
+                ?.getOrNull(1)
+                ?.toLong()
+                ?.div(1024)
+                ?: 0L
+        }
+    }.getOrDefault(0L)
 
     @Suppress("DEPRECATION")
     private fun wifiInfo(context: Context): Triple<String, Int, Int> {

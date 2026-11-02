@@ -15,9 +15,13 @@ CamNexusRTSP 在手机本地跑一个 RTSP 服务，把摄像头画面编码后�
 
 ## 界面
 
-| 主界面 | 运行中 · 展开设置 | 新手引导 |
-|:---:|:---:|:---:|
-| <img src="docs/screenshots/home.jpg" width="240" /> | <img src="docs/screenshots/streaming.jpg" width="240" /> | <img src="docs/screenshots/onboarding.jpg" width="240" /> |
+| 主界面 | 展开设置 |
+|:---:|:---:|
+| <img src="docs/screenshots/home.jpg" width="280" /> | <img src="docs/screenshots/settings-expanded.jpg" width="280" /> |
+
+| 设置 · 视频与网络 | 设置 · 网页控制与画面叠加 |
+|:---:|:---:|
+| <img src="docs/screenshots/settings-video.jpg" width="280" /> | <img src="docs/screenshots/settings-web.jpg" width="280" /> |
 
 ## 功能
 ### 画面

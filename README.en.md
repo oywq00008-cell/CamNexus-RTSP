@@ -17,9 +17,13 @@ it directly, with no PC relay and nothing uploaded to the cloud.
 
 ## Screenshots
 
-| Home | Streaming · settings expanded | Onboarding |
-|:---:|:---:|:---:|
-| <img src="docs/screenshots/home.jpg" width="240" /> | <img src="docs/screenshots/streaming.jpg" width="240" /> | <img src="docs/screenshots/onboarding.jpg" width="240" /> |
+| Home | Settings expanded |
+|:---:|:---:|
+| <img src="docs/screenshots/home.jpg" width="280" /> | <img src="docs/screenshots/settings-expanded.jpg" width="280" /> |
+
+| Settings · video and network | Settings · web console and overlay |
+|:---:|:---:|
+| <img src="docs/screenshots/settings-video.jpg" width="280" /> | <img src="docs/screenshots/settings-web.jpg" width="280" /> |
 
 ## Features
 ### Video

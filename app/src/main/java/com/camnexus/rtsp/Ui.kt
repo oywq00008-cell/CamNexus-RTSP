@@ -1,4 +1,4 @@
-﻿package com.camnexus.rtsp
+package com.camnexus.rtsp
 
 import android.app.Dialog
 import android.content.Context
@@ -70,6 +70,7 @@ object Ui {
         title: String,
         initial: String,
         hint: String = "",
+        tip: String = "",
         numeric: Boolean = false,
         password: Boolean = false,
         validate: (String) -> String? = { null },
@@ -84,17 +85,24 @@ object Ui {
 
         val input = dialog.findViewById<EditText>(R.id.dlgInput)
         val error = dialog.findViewById<TextView>(R.id.dlgError)
+        val tipView = dialog.findViewById<TextView>(R.id.dlgTip)
         dialog.findViewById<TextView>(R.id.dlgTitle)?.text = title
 
+        if (tip.isNotEmpty()) {
+            tipView?.text = tip
+            tipView?.visibility = View.VISIBLE
+        }
+
         input?.apply {
-            setText(initial)
-            this.hint = hint
-            setSelection(text.length)
+            // 先定输入类型，再填文字，否则切换成密码类型时光标会被重置到最前
             inputType = when {
                 numeric -> InputType.TYPE_CLASS_NUMBER
                 password -> InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                 else -> InputType.TYPE_CLASS_TEXT
             }
+            setText(initial)
+            this.hint = hint
+            setSelection(text.length)
         }
 
         dialog.findViewById<View>(R.id.dlgCancel)?.setOnClickListener { dialog.dismiss() }
@@ -112,6 +120,8 @@ object Ui {
 
         dialog.setOnShowListener {
             input?.requestFocus()
+            // 弹窗真正显示后把光标放到末尾，避免部分输入法把它复位到开头
+            input?.setSelection(input.text.length)
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             imm?.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
         }

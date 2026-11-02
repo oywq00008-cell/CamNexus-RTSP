@@ -1,4 +1,4 @@
-import java.util.Properties
+﻿import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -21,8 +21,8 @@ android {
         applicationId = "com.camnexus.rtsp"
         minSdk = 21
         targetSdk = 35
-        versionCode = 23
-        versionName = "2.3.6"
+        versionCode = 24
+        versionName = "3.0.0"
     }
 
     signingConfigs {
@@ -59,6 +59,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("com.github.pedroSG94:RTSP-Server:1.4.3")
+    implementation("org.nanohttpd:nanohttpd:2.3.1")
     implementation("com.github.pedroSG94.RootEncoder:library:2.8.1")
 }
 

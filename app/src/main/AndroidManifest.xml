@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -44,14 +44,49 @@
 
         <activity
             android:name=".SettingsActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:exported="false"
             android:label="@string/settings"
             android:parentActivityName=".MainActivity" />
+
+        <!-- 固定方向的设置页：真实 Activity 才能在启动窗口阶段就确定方向，避免先错后对 -->
+        <activity
+            android:name=".SettingsPortraitActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:exported="false"
+            android:label="@string/settings"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".SettingsLandscapeActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:exported="false"
+            android:label="@string/settings"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name=".DiagnoseActivity"
             android:exported="false"
             android:label="@string/diagnose" />
+
+        <!-- 固定方向的检测页：与设置页保持同一套横竖逻辑 -->
+        <activity
+            android:name=".DiagnosePortraitActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:exported="false"
+            android:label="@string/diagnose"
+            android:parentActivityName=".SettingsActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".DiagnoseLandscapeActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:exported="false"
+            android:label="@string/diagnose"
+            android:parentActivityName=".SettingsActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name=".OnboardingActivity"

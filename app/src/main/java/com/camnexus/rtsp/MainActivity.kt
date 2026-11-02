@@ -1,4 +1,4 @@
-﻿package com.camnexus.rtsp
+package com.camnexus.rtsp
 
 import android.Manifest
 import android.content.ClipData
@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +18,7 @@ import android.os.IBinder
 import android.util.Size
 import android.view.Gravity
 import android.view.MotionEvent
+import android.view.PixelCopy
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
@@ -32,6 +34,7 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -42,6 +45,10 @@ import java.util.Locale
 class MainActivity : AppCompatActivity(), StreamService.Listener {
 
     companion object {
+        private const val BUSY_NONE = 0
+        private const val BUSY_START = 1
+        private const val BUSY_STOP = 2
+        private const val BUSY_RECONNECT = 3
         private const val BITRATE_MIN = 500_000
         private const val BITRATE_STEP = 500_000
         private const val BITRATE_MAX = 20_000_000
@@ -49,6 +56,11 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
 
     private lateinit var root: View
     private lateinit var preview: SurfaceView
+    private lateinit var loadingOverlay: View
+    private lateinit var loadingSnapshot: ImageView
+    private lateinit var loadingText: TextView
+    private var busyMode = BUSY_NONE
+    private val busyTimeout = Runnable { hideBusy() }
     private lateinit var logoWatermark: ImageView
     private lateinit var statusPill: View
     private lateinit var statusDot: View
@@ -65,11 +77,23 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
     private lateinit var txtFps: TextView
     private lateinit var seekBitrate: SeekBar
     private lateinit var txtBitrate: TextView
+    private lateinit var txtTorch: TextView
+    private var torchMinutes = 0
+    private lateinit var switchUiLandscape: SwitchCompat
+    private var suppressUiLandscape = false
+    private val uiHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private lateinit var orientationHint: View
+    private lateinit var orientationHintText: TextView
+    private lateinit var orientationHintIcon: ImageView
+    private var attachedWidth = 0
+    private var attachedHeight = 0
 
     private var service: StreamService? = null
     private var bound = false
     private var previewAttached = false
     private var running = false
+    /** 省电降档会临时改实际帧率，设置行要跟着提示。 */
+    private var lowPowerActive = false
     private var expanded = false
     private var dragStartY = 0f
     private var dragStartHeight = 0
@@ -135,12 +159,25 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
         }
     }
 
+    /** 网页端改完配置后，首页立即刷新显示。 */
+    private val configReceiver = object : android.content.BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (hasCorePermissions()) refreshUiFromConfig()
+            // 网页改完配置会触发推流重建，这里先冻结画面再重连
+            busyMode = BUSY_RECONNECT
+            showBusy(R.string.loading_applying, snapshot = true)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         root = findViewById(R.id.root)
         preview = findViewById(R.id.preview)
+        loadingOverlay = findViewById(R.id.loadingOverlay)
+        loadingSnapshot = findViewById(R.id.loadingSnapshot)
+        loadingText = findViewById(R.id.loadingText)
         logoWatermark = findViewById(R.id.logoWatermark)
         statusPill = findViewById(R.id.statusPill)
         statusDot = findViewById(R.id.statusDot)
@@ -157,6 +194,25 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
         txtFps = findViewById(R.id.txtFps)
         seekBitrate = findViewById(R.id.seekBitrate)
         txtBitrate = findViewById(R.id.txtBitrate)
+        txtTorch = findViewById(R.id.txtTorch)
+        findViewById<View>(R.id.rowTorch).setOnClickListener { pickTorch() }
+        orientationHint = findViewById(R.id.orientationHint)
+        orientationHintText = findViewById(R.id.orientationHintText)
+        orientationHintIcon = findViewById(R.id.orientationHintIcon)
+        switchUiLandscape = findViewById(R.id.switchUiLandscape)
+        switchUiLandscape.setOnCheckedChangeListener { _, checked ->
+            if (suppressUiLandscape) return@setOnCheckedChangeListener
+            Prefs.update(this) { it.copy(uiLandscape = checked) }
+            // 先在当前方向下显示提示，1.2 秒后再转界面
+            showOrientationHint(checked)
+            uiHandler.removeCallbacksAndMessages(null)
+            uiHandler.postDelayed({
+                applyUiOrientation(checked)
+                // 方向变化后重建推流，让相机管线按新方向重新初始化
+                if (running) service?.applyConfig(Prefs.load(this))
+                preview.postDelayed({ reattachPreview() }, 400)
+            }, 1200)
+        }
 
         setupEdgeToEdge()
         adaptLayoutToScreen()
@@ -164,16 +220,32 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
         seekBitrate.max = (BITRATE_MAX - BITRATE_MIN) / BITRATE_STEP
         seekBitrate.setOnSeekBarChangeListener(seekListener)
         preview.holder.addCallback(surfaceCallback)
+        preview.addOnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            val newWidth = right - left
+            val newHeight = bottom - top
+            val oldWidth = oldRight - oldLeft
+            val oldHeight = oldBottom - oldTop
+            if (newWidth > 0 && newHeight > 0 && (newWidth != oldWidth || newHeight != oldHeight)) {
+                preview.postDelayed({ reattachPreview() }, 150)
+            }
+        }
 
         btnToggle.setOnClickListener { onToggleClicked() }
         findViewById<View>(R.id.btnCopy).setOnClickListener { copyUrl() }
         findViewById<View>(R.id.btnSettings).setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
+            // 用固定方向的子类启动，系统创建窗口时方向就是对的，不会先闪一下错误方向
+            val target = if (Prefs.load(this).uiLandscape) {
+                SettingsLandscapeActivity::class.java
+            } else {
+                SettingsPortraitActivity::class.java
+            }
+            startActivity(Intent(this, target))
         }
         findViewById<View>(R.id.expandRow).setOnClickListener { setExpanded(!expanded) }
 
         findViewById<View>(R.id.rowCamera).setOnClickListener { pickCamera() }
         findViewById<View>(R.id.rowResolution).setOnClickListener { pickResolution() }
+        
         findViewById<View>(R.id.rowFps).setOnClickListener { pickFps() }
         setupDrag()
         root.setOnClickListener { if (expanded) setExpanded(false) }
@@ -190,6 +262,14 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
     override fun onStart() {
         super.onStart()
         bindService(Intent(this, StreamService::class.java), connection, Context.BIND_AUTO_CREATE)
+        // 网页控制开启时，即使不推流也让服务待机常驻，保证网页可访问
+        if (Prefs.load(this).httpEnabled) StreamService.ensureHttp(this)
+        androidx.core.content.ContextCompat.registerReceiver(
+            this,
+            configReceiver,
+            android.content.IntentFilter(StreamService.ACTION_CONFIG_CHANGED),
+            androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     @SuppressLint("MissingSuperCall")
@@ -215,6 +295,7 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
     }
 
     override fun onStop() {
+        runCatching { unregisterReceiver(configReceiver) }
         previewAttached = false
         service?.detachPreview()
         service?.setListener(null)
@@ -288,9 +369,13 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
             listOf(Size(640, 480), Size(1280, 720))
         }
         txtResolution.text = config.resolutionText
+        suppressUiLandscape = true
+        switchUiLandscape.isChecked = config.uiLandscape
+        suppressUiLandscape = false
+        applyUiOrientation(config.uiLandscape)
 
         fpsOptions = CameraCaps.fpsOptions(this, cameraId, config.width, config.height)
-        txtFps.text = "${config.fps} fps"
+        txtFps.text = FpsRules.label(config, lowPowerActive, getString(R.string.fps_effective_fmt))
 
         seekBitrate.progress = progressForBitrate(config.bitrate)
         txtBitrate.text = formatBitrate(config.bitrate)
@@ -458,9 +543,65 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
         Ui.toast(this, getString(R.string.copied))
     }
 
+    /** 半透明加载遮罩：抓一帧预览做模糊底图，避免重连时黑屏闪烁。 */
+    private fun showBusy(textRes: Int, snapshot: Boolean) {
+        loadingText.setText(textRes)
+        if (snapshot) {
+            capturePreviewSnapshot()
+        } else {
+            loadingSnapshot.setImageBitmap(null)
+        }
+        loadingOverlay.visibility = View.VISIBLE
+        loadingOverlay.animate().cancel()
+        loadingOverlay.alpha = 0f
+        loadingOverlay.animate().alpha(1f).setDuration(140).start()
+        loadingOverlay.removeCallbacks(busyTimeout)
+        loadingOverlay.postDelayed(busyTimeout, 12000)
+    }
+
+    private fun hideBusy() {
+        busyMode = BUSY_NONE
+        loadingOverlay.removeCallbacks(busyTimeout)
+        if (loadingOverlay.visibility != View.VISIBLE) return
+        loadingOverlay.animate().cancel()
+        loadingOverlay.animate().alpha(0f).setDuration(300).withEndAction {
+            loadingOverlay.visibility = View.GONE
+            loadingSnapshot.setImageBitmap(null)
+        }.start()
+    }
+
+    /**
+     * 抓取当前预览帧并缩小到 1/14，再由 ImageView 放大显示，
+     * 利用双线性插值得到廉价的高斯模糊观感（不依赖 API 31 的 RenderEffect）。
+     */
+    private fun capturePreviewSnapshot() {
+        loadingSnapshot.setImageBitmap(null)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return
+        val width = preview.width
+        val height = preview.height
+        if (width <= 0 || height <= 0) return
+        val full = runCatching {
+            Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        }.getOrNull() ?: return
+        runCatching {
+            PixelCopy.request(preview, full, { result ->
+                if (result == PixelCopy.SUCCESS && !isFinishing && !isDestroyed) {
+                    val smallWidth = (width / 14).coerceAtLeast(6)
+                    val smallHeight = (height / 14).coerceAtLeast(6)
+                    runCatching { Bitmap.createScaledBitmap(full, smallWidth, smallHeight, true) }
+                        .getOrNull()
+                        ?.let { loadingSnapshot.setImageBitmap(it) }
+                }
+                runCatching { full.recycle() }
+            }, android.os.Handler(android.os.Looper.getMainLooper()))
+        }.onFailure { runCatching { full.recycle() } }
+    }
+
     private fun onToggleClicked() {
         val streamService = service
         if (streamService != null && streamService.isRunning()) {
+            busyMode = BUSY_STOP
+            showBusy(R.string.loading_stopping, snapshot = true)
             StreamService.stop(this)
             return
         }
@@ -468,6 +609,8 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
             permissionLauncher.launch(requiredPermissions())
             return
         }
+        busyMode = BUSY_START
+        showBusy(R.string.loading_starting, snapshot = false)
         StreamService.start(this)
     }
 
@@ -519,6 +662,36 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
         }
     }
 
+    /** 补光灯：选择开启时长，20 分钟以上先给寿命/发热提示。 */
+    private fun pickTorch() {
+        val minuteOptions = intArrayOf(0, 1, 5, 10, 20, 30, 60)
+        val labels = minuteOptions.map {
+            if (it == 0) getString(R.string.torch_off) else getString(R.string.torch_minutes, it)
+        }
+        val selected = minuteOptions.indexOf(torchMinutes).coerceAtLeast(0)
+        Ui.picker(this, getString(R.string.torch_title), labels, selected) { index ->
+            val minutes = minuteOptions[index]
+            // 先真正开启，成功后再提示长时风险；失败（未开播/不支持）只提示错误
+            if (applyTorch(minutes) && minutes >= 20) {
+                showHint(R.drawable.ic_warning, R.string.torch_warning)
+            }
+        }
+    }
+
+    private fun applyTorch(minutes: Int): Boolean {
+        val error = service?.setTorch(minutes) ?: getString(R.string.torch_need_service)
+        if (error.isNotEmpty()) {
+            Ui.toast(this, error)
+            return false
+        }
+        torchMinutes = minutes
+        txtTorch.text = if (minutes == 0) {
+            getString(R.string.torch_off)
+        } else {
+            getString(R.string.torch_minutes, minutes)
+        }
+        return true
+    }
     private fun pickFps() {
         val config = Prefs.load(this)
         if (fpsOptions.isEmpty()) fpsOptions = listOf(config.fps)
@@ -537,6 +710,20 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
 
     override fun onState(state: StreamService.State) {
         running = state.running
+        // 补光灯到时自动关闭后，界面跟着复位
+        val serviceTorch = service?.currentTorchMinutes() ?: 0
+        if (serviceTorch != torchMinutes) {
+            torchMinutes = serviceTorch
+            txtTorch.text = if (serviceTorch == 0) {
+                getString(R.string.torch_off)
+            } else {
+                getString(R.string.torch_minutes, serviceTorch)
+            }
+        }
+        if (state.lowPower != lowPowerActive) {
+            lowPowerActive = state.lowPower
+            refreshUiFromConfig()
+        }
         if (state.running) {
             showWatermark(false)
             if (preview.visibility != View.VISIBLE) preview.visibility = View.VISIBLE
@@ -549,6 +736,9 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
             btnToggle.setBackgroundResource(R.drawable.bg_button_danger)
             btnToggle.setTextColor(ContextCompat.getColor(this, R.color.danger))
             if (!previewAttached) attachPreviewIfPossible()
+            if (busyMode == BUSY_START || busyMode == BUSY_RECONNECT) {
+                loadingOverlay.postDelayed({ if (running) hideBusy() }, 260)
+            }
         } else {
             showWatermark(true)
             if (preview.visibility != View.INVISIBLE) preview.visibility = View.INVISIBLE
@@ -564,6 +754,7 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
             txtMeta.text = state.message.ifBlank {
                 "${config.codecLabel} · :${config.port} · ${config.bitrate / 1000} kbps"
             }
+            if (busyMode == BUSY_STOP) hideBusy()
         }
     }
 
@@ -584,14 +775,67 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
             ColorStateList.valueOf(ContextCompat.getColor(this, colorRes))
     }
 
-    private fun attachPreviewIfPossible() {
+    /** 切换方向后弹一个图标提示，告诉用户该怎么摆放设备。 */
+    private fun showOrientationHint(landscape: Boolean) {
+        showHint(
+            R.drawable.ic_mobile_rotate,
+            if (landscape) R.string.orientation_hint_portrait
+            else R.string.orientation_hint_landscape
+        )
+    }
+
+    /** 居中提示：图标 + 文案，2.6 秒后淡出。 */
+    private fun showHint(iconRes: Int, textRes: Int) {
+        orientationHintIcon.setImageResource(iconRes)
+        orientationHintText.setText(textRes)
+        orientationHint.visibility = View.VISIBLE
+        orientationHint.animate().cancel()
+        orientationHint.alpha = 0f
+        orientationHint.animate().alpha(1f).setDuration(180).start()
+        orientationHint.removeCallbacks(hideOrientationHint)
+        orientationHint.postDelayed(hideOrientationHint, 2600)
+    }
+
+    private val hideOrientationHint = Runnable {
+        orientationHint.animate().cancel()
+        orientationHint.animate().alpha(0f).setDuration(260).withEndAction {
+            orientationHint.visibility = View.GONE
+        }.start()
+    }
+    /** 手动切换界面方向；推流方向跟随界面。 */
+    private fun applyUiOrientation(landscape: Boolean) {
+        val desired = if (landscape) {
+            android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        } else {
+            android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+        if (requestedOrientation != desired) requestedOrientation = desired
+    }
+
+    /** 旋转后预览控件尺寸变化，必须按新尺寸重新挂载，否则只显示一条。 */
+    private fun reattachPreview() {
+        if (!running) return
+        val streamService = service ?: return
+        if (preview.width <= 0 || preview.height <= 0) return
+        streamService.detachPreview()
+        previewAttached = false
+        attachPreviewIfPossible()
+    }
+
+    private fun attachPreviewIfPossible(retry: Int = 0) {
         val streamService = service ?: return
         if (!streamService.isRunning()) return
         val holder = preview.holder
         if (!holder.surface.isValid) return
-        val width = if (preview.width > 0) preview.width else 1080
-        val height = if (preview.height > 0) preview.height else 1920
+        val width = preview.width
+        val height = preview.height
+        if (width <= 0 || height <= 0) {
+            if (retry < 20) preview.postDelayed({ attachPreviewIfPossible(retry + 1) }, 120)
+            return
+        }
         streamService.attachPreview(holder.surface, width, height)
+        attachedWidth = width
+        attachedHeight = height
         previewAttached = true
     }
 

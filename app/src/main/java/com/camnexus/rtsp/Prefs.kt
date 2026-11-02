@@ -18,8 +18,26 @@ data class StreamConfig(
     val username: String = DEFAULT_USER,
     val password: String = DEFAULT_PASSWORD,
     val powerSaving: Boolean = false,
-    val encoder: String = ENCODER_AUTO
+    val encoder: String = ENCODER_AUTO,
+    val nightMode: Int = NIGHT_OFF,
+    val denoiseEnabled: Boolean = true,
+    val denoiseLevel: Int = 60,
+    val httpEnabled: Boolean = false,
+    val httpPort: Int = 8080,
+    val httpUser: String = DEFAULT_USER,
+    val httpPass: String = DEFAULT_PASSWORD,
+    val osdEnabled: Boolean = false,
+    val osdDate: Boolean = true,
+    val osdDateFormat: Int = 0,
+    val osdBattery: Boolean = true,
+    val osdBatteryIcon: Boolean = true,
+    val osdPosition: Int = 1,
+    val osdRotation: Int = 0,
+    val osdFlip: Int = 0,
+    /** 界面方向：true 横屏界面，false 竖屏界面。推流方向跟随界面。 */
+    val uiLandscape: Boolean = false
 ) {
+
     val resolutionText: String get() = "${width}x$height"
     val codecLabel: String get() = if (codec == CODEC_H265) "H.265" else "H.264"
 
@@ -32,6 +50,9 @@ data class StreamConfig(
         const val ENCODER_AUTO = "auto"
         const val ENCODER_HARDWARE = "hardware"
         const val ENCODER_SOFTWARE = "software"
+        const val NIGHT_OFF = 0
+        const val NIGHT_STANDARD = 1
+        const val NIGHT_STRONG = 2
     }
 }
 
@@ -39,6 +60,7 @@ object Prefs {
 
     private const val NAME = "camnexus"
     private const val KEY_CAMERA = "cameraId"
+    private const val KEY_UI_LANDSCAPE = "uiLandscape"
     private const val KEY_WIDTH = "width"
     private const val KEY_HEIGHT = "height"
     private const val KEY_FPS = "fps"
@@ -50,6 +72,21 @@ object Prefs {
     private const val KEY_PASSWORD = "password"
     private const val KEY_POWER = "powerSaving"
     private const val KEY_ENCODER = "encoder"
+    private const val KEY_NIGHT = "nightMode"
+    private const val KEY_DENOISE_ON = "denoiseEnabled"
+    private const val KEY_DENOISE_LEVEL = "denoiseLevel"
+    private const val KEY_HTTP_ON = "httpEnabled"
+    private const val KEY_HTTP_PORT = "httpPort"
+    private const val KEY_HTTP_USER = "httpUser"
+    private const val KEY_HTTP_PASS = "httpPass"
+    private const val KEY_OSD_ON = "osdEnabled"
+    private const val KEY_OSD_DATE = "osdDate"
+    private const val KEY_OSD_DATE_FMT = "osdDateFormat"
+    private const val KEY_OSD_BATT = "osdBattery"
+    private const val KEY_OSD_BATT_ICON = "osdBatteryIcon"
+    private const val KEY_OSD_POS = "osdPosition"
+    private const val KEY_OSD_ROT = "osdRotation"
+    private const val KEY_OSD_FLIP = "osdFlip"
 
     private fun sp(context: Context): SharedPreferences =
         context.getSharedPreferences(NAME, Context.MODE_PRIVATE)
@@ -69,7 +106,23 @@ object Prefs {
             password = p.getString(KEY_PASSWORD, StreamConfig.DEFAULT_PASSWORD)
                 ?: StreamConfig.DEFAULT_PASSWORD,
             powerSaving = p.getBoolean(KEY_POWER, false),
-            encoder = p.getString(KEY_ENCODER, StreamConfig.ENCODER_AUTO) ?: StreamConfig.ENCODER_AUTO
+            encoder = p.getString(KEY_ENCODER, StreamConfig.ENCODER_AUTO) ?: StreamConfig.ENCODER_AUTO,
+            nightMode = p.getInt(KEY_NIGHT, StreamConfig.NIGHT_OFF),
+            denoiseEnabled = p.getBoolean(KEY_DENOISE_ON, true),
+            denoiseLevel = p.getInt(KEY_DENOISE_LEVEL, 60),
+            httpEnabled = p.getBoolean(KEY_HTTP_ON, false),
+            httpPort = p.getInt(KEY_HTTP_PORT, 8080),
+            httpUser = p.getString(KEY_HTTP_USER, StreamConfig.DEFAULT_USER) ?: StreamConfig.DEFAULT_USER,
+            httpPass = p.getString(KEY_HTTP_PASS, StreamConfig.DEFAULT_PASSWORD) ?: StreamConfig.DEFAULT_PASSWORD,
+            osdEnabled = p.getBoolean(KEY_OSD_ON, false),
+            osdDate = p.getBoolean(KEY_OSD_DATE, true),
+            osdDateFormat = p.getInt(KEY_OSD_DATE_FMT, 0),
+            osdBattery = p.getBoolean(KEY_OSD_BATT, true),
+            osdBatteryIcon = p.getBoolean(KEY_OSD_BATT_ICON, true),
+            osdPosition = p.getInt(KEY_OSD_POS, 1),
+            osdRotation = p.getInt(KEY_OSD_ROT, 0),
+            osdFlip = p.getInt(KEY_OSD_FLIP, 0),
+            uiLandscape = p.getBoolean(KEY_UI_LANDSCAPE, false)
         )
     }
 
@@ -87,6 +140,22 @@ object Prefs {
             .putString(KEY_PASSWORD, config.password)
             .putBoolean(KEY_POWER, config.powerSaving)
             .putString(KEY_ENCODER, config.encoder)
+            .putInt(KEY_NIGHT, config.nightMode)
+            .putBoolean(KEY_DENOISE_ON, config.denoiseEnabled)
+            .putInt(KEY_DENOISE_LEVEL, config.denoiseLevel)
+            .putBoolean(KEY_HTTP_ON, config.httpEnabled)
+            .putInt(KEY_HTTP_PORT, config.httpPort)
+            .putString(KEY_HTTP_USER, config.httpUser)
+            .putString(KEY_HTTP_PASS, config.httpPass)
+            .putBoolean(KEY_OSD_ON, config.osdEnabled)
+            .putBoolean(KEY_OSD_DATE, config.osdDate)
+            .putInt(KEY_OSD_DATE_FMT, config.osdDateFormat)
+            .putBoolean(KEY_OSD_BATT, config.osdBattery)
+            .putBoolean(KEY_OSD_BATT_ICON, config.osdBatteryIcon)
+            .putInt(KEY_OSD_POS, config.osdPosition)
+            .putInt(KEY_OSD_ROT, config.osdRotation)
+            .putInt(KEY_OSD_FLIP, config.osdFlip)
+            .putBoolean(KEY_UI_LANDSCAPE, config.uiLandscape)
             .apply()
     }
 

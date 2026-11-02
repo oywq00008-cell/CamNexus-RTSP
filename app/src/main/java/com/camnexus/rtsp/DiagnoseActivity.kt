@@ -1,4 +1,4 @@
-﻿package com.camnexus.rtsp
+package com.camnexus.rtsp
 
 import android.graphics.Color
 import android.os.Build
@@ -18,7 +18,7 @@ import androidx.core.view.updatePadding
  * 设备检测：读取本机编码器/相机/内存/网络能力，给出一组推荐参数。
  * 全部在本地完成，不上传任何数据。
  */
-class DiagnoseActivity : AppCompatActivity() {
+open class DiagnoseActivity : AppCompatActivity() {
 
     private lateinit var header: View
     private lateinit var cardInfo: LinearLayout

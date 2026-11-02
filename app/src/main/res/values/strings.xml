@@ -127,7 +127,69 @@
     <string name="retry_waiting">启动失败，正在重试（%1$d/%2$d）</string>
     <string name="reconnecting">画面卡住，正在重连…</string>
     <string name="keepalive_old_system">Android 5.x 没有电池优化白名单，无需设置</string>
+    <string name="night_title">夜景模式</string>
+    <string name="night_off">关闭</string>
+    <string name="night_standard">标准（提亮）</string>
+    <string name="night_strong">增强（提亮 + 曝光）</string>
+    <string name="denoise_title">降噪</string>
+    <string name="denoise_level">降噪强度</string>
+    <string name="http_section">网页控制</string>
+    <string name="http_enable">启用网页控制</string>
+    <string name="http_enable_hint">浏览器打开 http://手机IP:端口 查看运行状态</string>
+    <string name="http_port">网页端口</string>
+    <string name="http_user">网页账号</string>
+    <string name="http_pass">网页密码</string>
+    <string name="msg_invalid_http_port">端口需在 1024–65535 之间</string>
+    <string name="osd_section">画面叠加</string>
+    <string name="osd_enable">显示叠加</string>
+    <string name="osd_date">日期时间</string>
+    <string name="osd_date_format">日期格式</string>
+    <string name="osd_battery">电量</string>
+    <string name="osd_battery_icon">电量图标</string>
+    <string name="osd_position">位置</string>
+    <string name="osd_rotation">旋转</string>
+    <string name="osd_flip">翻转</string>
+    <string name="osd_pos_tl">左上角</string>
+    <string name="osd_pos_tr">右上角</string>
+    <string name="osd_pos_bl">左下角</string>
+    <string name="osd_pos_br">右下角</string>
+    <string name="osd_flip_none">不翻转</string>
+    <string name="osd_flip_h">水平翻转</string>
+    <string name="osd_flip_v">垂直翻转</string>
+    <string name="osd_flip_hv">水平 + 垂直</string>
+    <string name="loading_starting">正在启动服务…</string>
+    <string name="loading_stopping">正在停止服务…</string>
+    <string name="loading_applying">正在应用设置…</string>
+    <string name="state_ready">待机中 · 网页可访问</string>
+    <string name="notification_idle">待机中，网页可远程开启</string>
+    <string name="fps_effective_fmt">%1$d fps（实际 %2$d）</string>
+    <string name="label_ui_landscape">横屏界面</string>
+    <string name="orientation_hint_landscape">请将设备竖向放置</string>
+    <string name="orientation_hint_portrait">请将设备横向放置</string>
+    <string name="repo_link">https://github.com/oywq00008-cell/CamNexus-RTSP</string>
+    <string name="torch_title">补光灯</string>
+    <string name="torch_off">关闭</string>
+    <string name="torch_minutes">%1$d 分钟</string>
+    <string name="torch_warning">长时间开启手机闪光灯会增加机身温度，且缩短 LED 寿命</string>
+    <string name="torch_unsupported">当前相机不支持补光灯</string>
+    <string name="torch_need_service">请先开启服务</string>
+    <string name="http_url_hint">浏览器打开 %1$s 查看状态和修改设置</string>
+    <string name="password_tip">默认密码为 camnexus，请及时修改</string>
+    <string name="msg_port_conflict">RTSP 端口与网页端口不能冲突（含 8080–8082 的自动顺延）</string>
+    <string name="ok">确定</string>
+    <string name="placeholder_dash">—</string>
+    <string name="rtsp_placeholder">rtsp://—</string>
 </resources>
+
+
+
+
+
+
+
+
+
+
 
 
 

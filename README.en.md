@@ -27,6 +27,9 @@ it directly, with no PC relay and nothing uploaded to the cloud.
 - Full-screen live preview with resolution, frame rate, and viewer count on the status bar
 - Switch camera, resolution, frame rate, and bitrate at any time — changes take effect in about a second
 - H.264 and H.265, with hardware encoding preferred and a software fallback
+- One-tap portrait / landscape UI switch; the stream follows the interface orientation
+- Torch with 1–60 minute timer, turns off automatically
+- Night enhancement, adjustable denoise, and OSD overlay (time, battery, position, rotation, flip)
 - Multi-camera phones are detected automatically and labeled as ultra-wide / main / telephoto;
   duplicate logical cameras are merged
 
@@ -36,6 +39,7 @@ it directly, with no PC relay and nothing uploaded to the cloud.
 - Multiple viewers at the same time
 - Optional authentication (username and password), enabled by default
 - Configurable port, default 8554
+- Built-in web console (off by default): open `http://<phone-ip>:8080` to view status, edit settings, and toggle streaming
 
 ### Running unattended
 
@@ -81,6 +85,10 @@ The default username and password are both `camnexus`; change them in Settings.
 | Authentication | Toggle, username, password |
 | Background keep-alive | Check battery optimization status and jump to system settings |
 | Device check | Read hardware capabilities and recommend settings |
+| Landscape UI | Rotates the UI and the stream together to match how the phone is mounted |
+| Torch | Off / 1 / 5 / 10 / 20 / 30 / 60 minutes, with a heat and LED-lifetime warning for long runs |
+| Web console | Browser access for status and settings, off by default |
+| OSD | Time, battery, position, rotation, flip |
 
 ## Requirements
 

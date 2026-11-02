@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -143,6 +143,96 @@
                     android:paddingBottom="10dp"
                     android:textColor="@color/text_tertiary"
                     android:textSize="12sp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/stroke" />
+
+                <LinearLayout
+                    android:id="@+id/rowNight"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/night_title" />
+
+                    <TextView
+                        android:id="@+id/txtNight"
+                        style="@style/Text.RowValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginLeft="8dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_tertiary" />
+                </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/stroke" />
+
+                <LinearLayout
+                    android:id="@+id/rowDenoise"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/denoise_title" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchDenoise"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/boxDenoiseLevel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="10dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:minHeight="40dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            style="@style/Text.RowLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/denoise_level" />
+
+                        <TextView
+                            android:id="@+id/txtDenoiseLevel"
+                            style="@style/Text.RowValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <SeekBar
+                        android:id="@+id/seekDenoise"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="100" />
+                </LinearLayout>
             </LinearLayout>
 
             <TextView
@@ -329,6 +419,362 @@
                 android:textColor="@color/text_tertiary"
                 android:textSize="12sp" />
 
+
+                        <TextView
+                style="@style/Text.SectionLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/http_section" />
+
+            <LinearLayout
+                style="@style/Widget.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/rowHttp"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/http_enable" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchHttp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtHttpUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingBottom="12dp"
+                    android:text="@string/http_enable_hint"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:id="@+id/rowHttpPort"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/http_port" />
+
+                    <TextView
+                        android:id="@+id/txtHttpPort"
+                        style="@style/Text.RowValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginLeft="8dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_tertiary" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/stroke" />
+
+                <LinearLayout
+                    android:id="@+id/rowHttpUser"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/http_user" />
+
+                    <TextView
+                        android:id="@+id/txtHttpUser"
+                        style="@style/Text.RowValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginLeft="8dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_tertiary" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/stroke" />
+
+                <LinearLayout
+                    android:id="@+id/rowHttpPass"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/http_pass" />
+
+                    <TextView
+                        android:id="@+id/txtHttpPass"
+                        style="@style/Text.RowValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginLeft="8dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_tertiary" />
+                </LinearLayout>
+            </LinearLayout>
+            <TextView
+                style="@style/Text.SectionLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/osd_section" />
+
+            <LinearLayout
+                style="@style/Widget.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/rowOsd"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/osd_enable" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchOsd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/stroke" />
+
+                <LinearLayout
+                    android:id="@+id/rowOsdDate"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/osd_date" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchOsdDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/stroke" />
+
+                <LinearLayout
+                    android:id="@+id/rowOsdDateFormat"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/osd_date_format" />
+
+                    <TextView
+                        android:id="@+id/txtOsdDateFormat"
+                        style="@style/Text.RowValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginLeft="8dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_tertiary" />
+                </LinearLayout>                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/stroke" />
+
+                <LinearLayout
+                    android:id="@+id/rowOsdBattery"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/osd_battery" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchOsdBattery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/stroke" />
+
+                <LinearLayout
+                    android:id="@+id/rowOsdBatteryIcon"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/osd_battery_icon" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchOsdBatteryIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/stroke" />
+
+                <LinearLayout
+                    android:id="@+id/rowOsdPosition"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/osd_position" />
+
+                    <TextView
+                        android:id="@+id/txtOsdPosition"
+                        style="@style/Text.RowValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginLeft="8dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_tertiary" />
+                </LinearLayout>                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/stroke" />
+
+                <LinearLayout
+                    android:id="@+id/rowOsdRotation"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/osd_rotation" />
+
+                    <TextView
+                        android:id="@+id/txtOsdRotation"
+                        style="@style/Text.RowValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginLeft="8dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_tertiary" />
+                </LinearLayout>                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/stroke" />
+
+                <LinearLayout
+                    android:id="@+id/rowOsdFlip"
+                    style="@style/Widget.Row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/Text.RowLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/osd_flip" />
+
+                    <TextView
+                        android:id="@+id/txtOsdFlip"
+                        style="@style/Text.RowValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginLeft="8dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/text_tertiary" />
+                </LinearLayout>            </LinearLayout>
             <LinearLayout
                 style="@style/Widget.Card"
                 android:layout_width="match_parent"
@@ -426,8 +872,7 @@
                         app:tint="@color/text_tertiary" />
                 </LinearLayout>
             </LinearLayout>
-
-            <TextView
+<TextView
                 android:id="@+id/txtVersion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -435,8 +880,20 @@
                 android:gravity="center"
                 android:textColor="@color/text_tertiary"
                 android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/txtRepoLink"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="8dp"
+            android:autoLink="web"
+            android:gravity="center"
+            android:linksClickable="true"
+            android:text="@string/repo_link"
+            android:textColor="#4DA3FF"
+            android:textSize="12sp" />
         </LinearLayout>
     </ScrollView>
 
 </LinearLayout>
-

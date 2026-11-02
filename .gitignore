@@ -1,4 +1,5 @@
 ﻿# 构建产物
+.kotlin/
 .gradle/
 build/
 app/build/
@@ -28,3 +29,6 @@ tools/
 PLAN.md
 clone*.png
 clone*.xml
+
+# 本地文件备份
+backup/

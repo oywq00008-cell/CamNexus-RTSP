@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CamNexusRTSP</string>
+
+    <string name="state_idle">Off</string>
+    <string name="state_live">Live</string>
+    <string name="state_starting">Starting</string>
+
+    <string name="btn_start">Start service</string>
+    <string name="btn_stop">Stop service</string>
+
+    <string name="expand_settings">Expand settings</string>
+    <string name="collapse_settings">Collapse settings</string>
+
+    <string name="label_camera">Camera</string>
+    <string name="label_resolution">Resolution</string>
+    <string name="label_fps">Frame rate</string>
+    <string name="label_bitrate">Bitrate</string>
+
+    <string name="settings">Settings</string>
+    <string name="settings_video">Video</string>
+    <string name="settings_runtime">Runtime</string>
+    <string name="settings_network">Network</string>
+
+    <string name="label_codec">Codec</string>
+    <string name="label_encoder">Encoder</string>
+    <string name="encoder_auto">Auto</string>
+    <string name="encoder_hardware">Hardware</string>
+    <string name="encoder_software">Software</string>
+    <string name="encoder_info_fmt">Using: %1$s</string>
+    <string name="encoder_none">No usable encoder on this device</string>
+    <string name="codec_h265_unsupported">No H.265 encoder here; staying on H.264</string>
+    <string name="codec_h265_software">Only a software H.265 encoder found; may stutter</string>
+    <string name="label_power_saving">Power saving</string>
+    <string name="label_port">RTSP port</string>
+    <string name="label_auth">Authentication</string>
+    <string name="label_username">Username</string>
+    <string name="label_password">Password</string>
+
+    <string name="power_saving_hint">Drops to low quality after 60s with no viewers. Restart the service to restore the configured quality.</string>
+    <string name="auth_hint">Players must enter the username and password when enabled</string>
+    <string name="restart_hint">Changes apply immediately; while streaming the service restarts once (about a second).</string>
+    <string name="codec_hint">H.265 is smaller but needs support from both the phone and the player</string>
+
+    <string name="diagnose">Device check</string>
+    <string name="diagnose_title">Device check</string>
+    <string name="diagnose_device">Device info</string>
+    <string name="diagnose_recommend">Recommended settings</string>
+    <string name="diagnose_apply">Apply recommendation</string>
+    <string name="diagnose_applied">Recommendation applied</string>
+    <string name="diagnose_hint">Recommendations come from this device\u0027s codecs, camera, RAM and current Wi-Fi conditions. You can adjust everything in Settings anytime.</string>
+    <string name="info_soc">SoC</string>
+    <string name="info_architecture">Architecture</string>
+    <string name="info_ram">RAM</string>
+    <string name="info_h264">H.264 encoder</string>
+    <string name="info_h265">H.265 encoder</string>
+    <string name="info_camera">Cameras</string>
+    <string name="info_wifi">Network</string>
+    <string name="unknown">Unknown</string>
+    <string name="version_fmt">Version %1$s</string>
+
+    <string name="permission_needed">Camera and microphone permissions are required to start</string>
+    <string name="copied">Address copied</string>
+    <string name="copy_url">Copy address</string>
+    <string name="open_settings">Settings</string>
+    <string name="back">Back</string>
+
+    <string name="msg_invalid_port">Port must be between 1024 and 65535</string>
+    <string name="msg_invalid_auth">Username and password cannot be empty</string>
+    <string name="fps_adjusted">This resolution supports up to %1$d fps; adjusted automatically</string>
+    <string name="settings_adjusted">This camera does not support the previous resolution/frame rate; adjusted automatically</string>
+
+    <!-- Onboarding -->
+    <string name="guide">Onboarding</string>
+    <string name="guide_skip">Skip</string>
+    <string name="guide_next">Next</string>
+    <string name="guide_start">Get started</string>
+
+    <string name="guide_title_1">CamNexusRTSP</string>
+    <string name="guide_sub_1">Turn your phone into a LAN RTSP camera\nStream straight to PCs, tablets and NVRs</string>
+
+    <string name="guide_title_2">Everything at a glance</string>
+    <string name="guide_item_2a">Top status bar</string>
+    <string name="guide_item_2b">Shows quality, frame rate and viewer count in real time</string>
+    <string name="guide_item_2c">Full-screen preview</string>
+    <string name="guide_item_2d">Fills the whole screen, including the status bar and notch area</string>
+    <string name="guide_item_2e">Bottom control card</string>
+    <string name="guide_item_2f">Start or stop with one tap; expand to change camera, resolution, frame rate and bitrate</string>
+
+    <string name="guide_title_3">All the essentials</string>
+    <string name="guide_item_3a">H.264 / H.265 switching</string>
+    <string name="guide_item_3b">H.265 is smaller at the same quality but requires player support</string>
+    <string name="guide_item_3c">Runs with the screen off</string>
+    <string name="guide_item_3d">Keeps streaming after the screen turns off — ideal for surveillance</string>
+    <string name="guide_item_3e">Power saving</string>
+    <string name="guide_item_3f">Lowers quality when nobody is watching to reduce heat and battery drain</string>
+    <string name="guide_item_3g">Authentication</string>
+    <string name="guide_item_3h">Default username and password are both camnexus; change them in Settings</string>
+
+    <string name="guide_title_4">Grant the required permissions</string>
+    <string name="guide_sub_4">Camera and microphone are required; notifications show the persistent status.</string>
+    <string name="perm_camera">Camera</string>
+    <string name="perm_microphone">Microphone</string>
+    <string name="perm_notification">Notifications</string>
+    <string name="perm_granted">Granted</string>
+    <string name="perm_denied">Not granted</string>
+    <string name="perm_grant">Grant</string>
+    <string name="battery_title">Battery optimization</string>
+    <string name="battery_ok">Background running allowed</string>
+    <string name="battery_todo">Not set; the system may restrict it after locking</string>
+    <string name="guide_battery_hint">On Xiaomi, Huawei, OPPO and similar devices, also allow “Autostart” and “Unrestricted” in system settings.</string>
+    <string name="cancel">Cancel</string>
+    <string name="exit_title">Exit CamNexusRTSP</string>
+    <string name="exit_message">Exit now? A running stream keeps working in the background.</string>
+    <string name="exit_ok">Exit</string>
+    <string name="keepalive_title">Keep alive</string>
+    <string name="keepalive_ok">Whitelisted from battery optimization</string>
+    <string name="keepalive_todo">Not whitelisted; the system may stop it after the screen turns off</string>
+    <string name="keepalive_battery">Request battery exemption</string>
+    <string name="keepalive_go">Open app settings</string>
+    <string name="keepalive_huawei">Huawei/Honor: Settings → Battery → App launch → this app → Manage manually; enable Autostart, Secondary launch and Run in background.</string>
+    <string name="keepalive_xiaomi">Xiaomi/Redmi: Settings → Apps → Manage apps → this app → Battery saver → No restrictions; also enable Autostart.</string>
+    <string name="keepalive_zte">ZTE/Nubia: Settings → Apps → this app → Battery → Allow background activity; also enable Autostart.</string>
+    <string name="keepalive_oppo">OPPO/OnePlus/realme: Settings → Battery → App battery management → this app → Allow background running.</string>
+    <string name="keepalive_vivo">vivo/iQOO: Settings → Battery → High background power usage → allow this app to run in the background.</string>
+    <string name="keepalive_generic">Settings → Apps → this app → Battery → choose “Unrestricted / Allow background activity”.</string>
+    <string name="retry_waiting">Start failed, retrying (%1$d/%2$d)</string>
+    <string name="reconnecting">Stream stalled, reconnecting…</string>
+    <string name="keepalive_old_system">Android 5.x has no battery optimization whitelist; no action needed</string>
+    <string name="night_title">Night mode</string>
+    <string name="night_off">Off</string>
+    <string name="night_standard">Standard (brighter)</string>
+    <string name="night_strong">Enhanced (brighter + exposure)</string>
+    <string name="denoise_title">Denoise</string>
+    <string name="denoise_level">Denoise strength</string>
+    <string name="http_section">Web console</string>
+    <string name="http_enable">Enable web console</string>
+    <string name="http_enable_hint">Open http://phone-ip:port in a browser to view status</string>
+    <string name="http_port">Web port</string>
+    <string name="http_user">Web username</string>
+    <string name="http_pass">Web password</string>
+    <string name="msg_invalid_http_port">Port must be between 1024 and 65535</string>
+    <string name="osd_section">Overlay</string>
+    <string name="osd_enable">Show overlay</string>
+    <string name="osd_date">Date and time</string>
+    <string name="osd_date_format">Date format</string>
+    <string name="osd_battery">Battery</string>
+    <string name="osd_battery_icon">Battery icon</string>
+    <string name="osd_position">Position</string>
+    <string name="osd_rotation">Rotation</string>
+    <string name="osd_flip">Flip</string>
+    <string name="osd_pos_tl">Top left</string>
+    <string name="osd_pos_tr">Top right</string>
+    <string name="osd_pos_bl">Bottom left</string>
+    <string name="osd_pos_br">Bottom right</string>
+    <string name="osd_flip_none">None</string>
+    <string name="osd_flip_h">Horizontal</string>
+    <string name="osd_flip_v">Vertical</string>
+    <string name="osd_flip_hv">Horizontal + vertical</string>
+    <string name="loading_starting">Starting service…</string>
+    <string name="loading_stopping">Stopping service…</string>
+    <string name="loading_applying">Applying settings…</string>
+    <string name="state_ready">Idle · web console available</string>
+    <string name="notification_idle">Idle — the web console can start it remotely</string>
+    <string name="fps_effective_fmt">%1$d fps (actual %2$d)</string>
+    <string name="label_ui_landscape">Landscape UI</string>
+    <string name="orientation_hint_landscape">Place the device vertically</string>
+    <string name="orientation_hint_portrait">Place the device horizontally</string>
+    <string name="repo_link">https://github.com/oywq00008-cell/CamNexus-RTSP</string>
+    <string name="torch_title">Flashlight</string>
+    <string name="torch_off">Off</string>
+    <string name="torch_minutes">%1$d min</string>
+    <string name="torch_warning">Keeping the flashlight on for a long time heats the phone and shortens LED life</string>
+    <string name="torch_unsupported">The current camera does not support the flashlight</string>
+    <string name="torch_need_service">Start the service first</string>
+    <string name="http_url_hint">Open %1$s in a browser to view status and change settings</string>
+    <string name="password_tip">Default password is camnexus — change it soon</string>
+    <string name="msg_port_conflict">RTSP and web ports must not conflict (including the 8080–8082 fallback range)</string>
+    <string name="ok">OK</string>
+    <string name="placeholder_dash">—</string>
+    <string name="rtsp_placeholder">rtsp://—</string>
+
+    <!-- Language -->
+    <string name="language_title">Language</string>
+    <string name="language_zh">简体中文</string>
+    <string name="language_en">English</string>
+
+    <!-- Camera / encoder labels -->
+    <string name="cam_front">Front</string>
+    <string name="cam_back">Back</string>
+    <string name="cam_external">External</string>
+    <string name="cam_id_fmt">%1$s (ID %2$s)</string>
+    <string name="cam_lens_fmt">%1$s · %2$s %3$dmm (ID %4$s)</string>
+    <string name="lens_ultrawide">Ultra-wide</string>
+    <string name="lens_main">Main</string>
+    <string name="lens_tele">Telephoto</string>
+    <string name="lens_supertele">Super telephoto</string>
+    <string name="encoder_hw_suffix"> (hardware)</string>
+    <string name="encoder_sw_suffix"> (software)</string>
+    <string name="probe_hw_prefix">HW · </string>
+    <string name="probe_sw_prefix">SW · </string>
+
+    <!-- Status -->
+    <string name="status_clients_fmt"> · %1$d viewers</string>
+    <string name="status_low_power"> · Power save</string>
+    <string name="not_set">Not set</string>
+    <string name="core_count_fmt">%1$d cores</string>
+    <string name="low_ram_suffix"> (low RAM)</string>
+
+    <!-- Recommendation reasons -->
+    <string name="rec_no_hw_h265">No hardware H.265 encoder; switched back to H.264</string>
+    <string name="rec_hw_h265_ok">Hardware H.265 available; about 30% smaller at the same quality</string>
+    <string name="rec_no_h264">No H.264 encoder found; software encoding only</string>
+    <string name="rec_hw_encoder">Hardware encoder detected (%1$s)</string>
+    <string name="rec_sw_encoder">Only a software encoder (%1$s); resolution capped at 720p</string>
+    <string name="rec_low_ram">About %1$s GB RAM — a low-memory device</string>
+    <string name="rec_ram_ok">About %1$s GB RAM — enough for 1080p</string>
+    <string name="rec_ram">About %1$s GB RAM</string>
+    <string name="rec_1080p">Recommending 1080p: encoder and RAM are sufficient</string>
+    <string name="rec_720p">Recommending 720p: balances quality and stability</string>
+    <string name="rec_custom">Recommending %1$dx%2$d: higher resolutions are unstable on this device</string>
+    <string name="rec_network">Network: %1$s, link %2$d Mbps, signal %3$d dBm → bitrate factor %4$s</string>
+
+    <!-- Service status and errors -->
+    <string name="svc_client_connected">Client connected</string>
+    <string name="svc_client_disconnected">Client disconnected</string>
+    <string name="svc_fg_failed">Failed to start foreground service: %1$s</string>
+    <string name="svc_params_unsupported">Unsupported parameters: %1$s @%2$d fps</string>
+    <string name="svc_start_failed">Start failed: %1$s</string>
+    <string name="svc_switch_camera_failed">Failed to switch camera: %1$s</string>
+    <string name="svc_preview_failed">Failed to start preview: %1$s</string>
+    <string name="svc_json_invalid">Request body is not valid JSON</string>
+    <string name="svc_unknown_camera">Unsupported camera: %1$s</string>
+    <string name="svc_res_unsupported_camera">This camera does not support %1$dx%2$d; pick a resolution as well</string>
+    <string name="svc_res_unsupported">Unsupported resolution: %1$dx%2$d</string>
+    <string name="svc_fps_range">Frame rate must be between 1 and 60</string>
+    <string name="svc_fps_unsupported">This resolution does not support %1$d fps; available: %2$s</string>
+    <string name="svc_bitrate_range">Bitrate must be between 200000 and 20000000 bps</string>
+    <string name="svc_codec_invalid">Codec must be H264 or H265</string>
+    <string name="svc_rtsp_port_range">RTSP port must be between 1024 and 65535</string>
+    <string name="svc_port_conflict">RTSP port conflicts with the web port (%1$d)</string>
+    <string name="svc_night_invalid">Night mode must be 0 (off) / 1 (standard) / 2 (enhanced)</string>
+    <string name="svc_denoise_range">Denoise strength must be between 0 and 100</string>
+    <string name="svc_date_format_invalid">Date format must be 0–3</string>
+    <string name="svc_position_invalid">Overlay position must be 0–3</string>
+    <string name="svc_rotation_invalid">Rotation must be 0 / 90 / 180 / 270</string>
+    <string name="svc_flip_invalid">Flip must be 0–3</string>
+    <string name="svc_torch_range">Duration must be between 0 and 60 minutes</string>
+
+    <string name="svc_op_failed">Operation failed: %1$s</string>
+    <string name="svc_port_in_use">Port %1$d is already in use</string>
+    <string name="svc_connect_failed">Connection failed: %1$s</string>
+    <string name="svc_auth_failed">Authentication failed</string>
+</resources>

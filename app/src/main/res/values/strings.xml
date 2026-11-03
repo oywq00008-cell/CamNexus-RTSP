@@ -179,6 +179,78 @@
     <string name="ok">确定</string>
     <string name="placeholder_dash">—</string>
     <string name="rtsp_placeholder">rtsp://—</string>
+
+    <!-- 语言 -->
+    <string name="language_title">语言</string>
+    <string name="language_zh">简体中文</string>
+    <string name="language_en">English</string>
+
+    <!-- 相机 / 编码器标签 -->
+    <string name="cam_front">前置</string>
+    <string name="cam_back">后置</string>
+    <string name="cam_external">外接</string>
+    <string name="cam_id_fmt">%1$s（ID %2$s）</string>
+    <string name="cam_lens_fmt">%1$s · %2$s %3$dmm（ID %4$s）</string>
+    <string name="lens_ultrawide">超广角</string>
+    <string name="lens_main">主摄</string>
+    <string name="lens_tele">长焦</string>
+    <string name="lens_supertele">超长焦</string>
+    <string name="encoder_hw_suffix">（硬件）</string>
+    <string name="encoder_sw_suffix">（软件）</string>
+    <string name="probe_hw_prefix">硬件 · </string>
+    <string name="probe_sw_prefix">软件 · </string>
+
+    <!-- 状态与提示 -->
+    <string name="status_clients_fmt"> · 客户端 %1$d</string>
+    <string name="status_low_power"> · 省电档</string>
+    <string name="not_set">未设置</string>
+    <string name="core_count_fmt">%1$d 核</string>
+    <string name="low_ram_suffix">（低内存）</string>
+
+    <!-- 推荐理由 -->
+    <string name="rec_no_hw_h265">本机没有硬件 H.265 编码器，已改回 H.264</string>
+    <string name="rec_hw_h265_ok">H.265 硬编可用，同画质体积约省 30%</string>
+    <string name="rec_no_h264">没有找到 H.264 编码器，只能尝试软件编码</string>
+    <string name="rec_hw_encoder">检测到硬件编码器（%1$s）</string>
+    <string name="rec_sw_encoder">只有软件编码器（%1$s），分辨率压在 720p 以内</string>
+    <string name="rec_low_ram">内存约 %1$s GB，属于低内存设备</string>
+    <string name="rec_ram_ok">内存约 %1$s GB，足够跑 1080p</string>
+    <string name="rec_ram">内存约 %1$s GB</string>
+    <string name="rec_1080p">推荐 1080p：编码器和内存都够用</string>
+    <string name="rec_720p">推荐 720p：兼顾画质与稳定性</string>
+    <string name="rec_custom">推荐 %1$dx%2$d：更高分辨率在这台设备上不稳</string>
+    <string name="rec_network">网络：%1$s，链路 %2$dMbps，信号 %3$ddBm → 码率系数 %4$s</string>
+
+    <!-- 推流服务状态与错误 -->
+    <string name="svc_client_connected">客户端已连接</string>
+    <string name="svc_client_disconnected">客户端已断开</string>
+    <string name="svc_fg_failed">前台服务启动失败：%1$s</string>
+    <string name="svc_params_unsupported">参数不被支持：%1$s @%2$d fps</string>
+    <string name="svc_start_failed">启动失败：%1$s</string>
+    <string name="svc_switch_camera_failed">切换摄像头失败：%1$s</string>
+    <string name="svc_preview_failed">预览启动失败：%1$s</string>
+    <string name="svc_json_invalid">请求体不是合法 JSON</string>
+    <string name="svc_unknown_camera">不支持的相机：%1$s</string>
+    <string name="svc_res_unsupported_camera">该相机不支持当前分辨率 %1$dx%2$d，请同时选择分辨率</string>
+    <string name="svc_res_unsupported">不支持的分辨率：%1$dx%2$d</string>
+    <string name="svc_fps_range">帧率需在 1–60 之间</string>
+    <string name="svc_fps_unsupported">该分辨率不支持 %1$d fps，可选：%2$s</string>
+    <string name="svc_bitrate_range">码率需在 200000–20000000 bps 之间</string>
+    <string name="svc_codec_invalid">编码格式只支持 H264 / H265</string>
+    <string name="svc_rtsp_port_range">RTSP 端口需在 1024–65535 之间</string>
+    <string name="svc_port_conflict">RTSP 端口不能与网页端口（%1$d）冲突</string>
+    <string name="svc_night_invalid">夜景模式只能是 0（关闭）/ 1（标准）/ 2（增强）</string>
+    <string name="svc_denoise_range">降噪强度需在 0–100 之间</string>
+    <string name="svc_date_format_invalid">日期格式只能是 0–3</string>
+    <string name="svc_position_invalid">叠加位置只能是 0–3</string>
+    <string name="svc_rotation_invalid">旋转角度只能是 0 / 90 / 180 / 270</string>
+    <string name="svc_flip_invalid">翻转只能是 0–3</string>
+    <string name="svc_torch_range">时长需在 0–60 分钟之间</string>
+
+    <string name="svc_op_failed">操作失败：%1$s</string>
+    <string name="svc_port_in_use">端口 %1$d 被占用</string>
+    <string name="svc_connect_failed">连接失败：%1$s</string>
+    <string name="svc_auth_failed">鉴权失败</string>
 </resources>
 
 

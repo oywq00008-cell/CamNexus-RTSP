@@ -1,4 +1,4 @@
-package com.camnexus.rtsp
+﻿package com.camnexus.rtsp
 
 import android.Manifest
 import android.content.ClipData
@@ -761,12 +761,12 @@ class MainActivity : AppCompatActivity(), StreamService.Listener {
     private fun buildMeta(state: StreamService.State): String {
         val builder = StringBuilder()
         builder.append(state.resolution).append(" · ").append(state.fps).append("fps")
-        builder.append(" · 客户端 ").append(state.clients)
+        builder.append(getString(R.string.status_clients_fmt, state.clients))
         if (state.bitrate > 0L) {
             builder.append(" · ")
             builder.append(String.format(Locale.US, "%.1f Mbps", state.bitrate / 1_000_000f))
         }
-        if (state.lowPower) builder.append(" · 省电档")
+        if (state.lowPower) builder.append(getString(R.string.status_low_power))
         return builder.toString()
     }
 

@@ -20,7 +20,7 @@ data class StreamConfig(
     val powerSaving: Boolean = false,
     val encoder: String = ENCODER_AUTO,
     val nightMode: Int = NIGHT_OFF,
-    val denoiseEnabled: Boolean = true,
+    val denoiseEnabled: Boolean = false,
     val denoiseLevel: Int = 60,
     val httpEnabled: Boolean = false,
     val httpPort: Int = 8080,
@@ -108,7 +108,7 @@ object Prefs {
             powerSaving = p.getBoolean(KEY_POWER, false),
             encoder = p.getString(KEY_ENCODER, StreamConfig.ENCODER_AUTO) ?: StreamConfig.ENCODER_AUTO,
             nightMode = p.getInt(KEY_NIGHT, StreamConfig.NIGHT_OFF),
-            denoiseEnabled = p.getBoolean(KEY_DENOISE_ON, true),
+            denoiseEnabled = p.getBoolean(KEY_DENOISE_ON, false),
             denoiseLevel = p.getInt(KEY_DENOISE_LEVEL, 60),
             httpEnabled = p.getBoolean(KEY_HTTP_ON, false),
             httpPort = p.getInt(KEY_HTTP_PORT, 8080),
@@ -173,4 +173,13 @@ object Prefs {
     fun setOnboarded(context: Context, value: Boolean) {
         sp(context).edit().putBoolean(KEY_ONBOARDED, value).apply()
     }
+
+    private const val KEY_LANGUAGE = "app_language"
+
+    fun language(context: Context): String = sp(context).getString(KEY_LANGUAGE, "").orEmpty()
+
+    fun setLanguage(context: Context, tag: String) {
+        sp(context).edit().putString(KEY_LANGUAGE, tag).apply()
+    }
+
 }

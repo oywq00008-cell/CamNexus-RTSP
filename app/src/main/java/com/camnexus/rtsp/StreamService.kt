@@ -1,4 +1,4 @@
-﻿package com.camnexus.rtsp
+package com.camnexus.rtsp
 
 import android.annotation.SuppressLint
 import android.app.Notification
@@ -8,8 +8,10 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import android.content.pm.ServiceInfo
 import android.hardware.camera2.CameraCharacteristics
@@ -33,6 +35,7 @@ import com.pedro.common.VideoCodec
 import com.pedro.encoder.input.sources.audio.MicrophoneSource
 import com.pedro.encoder.input.sources.video.Camera2Source
 import com.pedro.encoder.input.video.CameraHelper
+import com.pedro.encoder.input.video.FrameCapturedCallback
 import com.pedro.encoder.utils.CodecUtil
 import com.pedro.rtspserver.RtspServerStream
 import com.pedro.rtspserver.server.ClientListener
@@ -125,6 +128,7 @@ class StreamService : Service(), ConnectChecker {
         torchMinutes = 0
     }
 
+
     private var wakeLock: PowerManager.WakeLock? = null
     private var wifiLock: WifiManager.WifiLock? = null
 
@@ -166,13 +170,13 @@ class StreamService : Service(), ConnectChecker {
     private val clientListener = object : ClientListener {
         override fun onClientConnected(client: ServerClient) {
             clientSeen[client] = System.currentTimeMillis()
-            lastMessage = "客户端已连接"
+            lastMessage = getString(R.string.svc_client_connected)
             push()
         }
 
         override fun onClientDisconnected(client: ServerClient) {
             clientSeen.remove(client)
-            lastMessage = "客户端已断开"
+            lastMessage = getString(R.string.svc_client_disconnected)
             push()
         }
 
@@ -192,6 +196,18 @@ class StreamService : Service(), ConnectChecker {
             push()
             mainHandler.postDelayed(this, 1000L)
         }
+    }
+
+    /** 服务不是 AppCompat 组件，这里手动套一层语言配置，保证通知与状态文案跟随 App 语言。 */
+    override fun attachBaseContext(newBase: Context) {
+        val tag = Prefs.language(newBase)
+        if (tag.isEmpty()) {
+            super.attachBaseContext(newBase)
+            return
+        }
+        val config = Configuration(newBase.resources.configuration)
+        config.setLocale(Locale.forLanguageTag(tag))
+        super.attachBaseContext(newBase.createConfigurationContext(config))
     }
 
     override fun onBind(intent: Intent?): IBinder = binder
@@ -318,6 +334,7 @@ class StreamService : Service(), ConnectChecker {
         push()
     }
 
+
     /** 夜景模式：GL 滤镜链，增强档额外拉曝光补偿。 */
     private fun applyNightFilters() {
         val stream = encoder ?: return
@@ -408,9 +425,10 @@ class StreamService : Service(), ConnectChecker {
                 applySettings = { body -> applySettingsJson(body) },
                 requestStream = { enabled -> requestStreaming(enabled) },
                 setTorchMinutes = { minutes ->
-                    if (minutes < 0 || minutes > 60) "时长需在 0–60 分钟之间"
+                    if (minutes < 0 || minutes > 60) getString(R.string.svc_torch_range)
                     else setTorch(minutes)
                 },
+                appVersion = { appVersion() },
                 logoBytes = { logoPngBytes() }
             )
             val ok = runCatching { server.start(2000, false) }.isSuccess
@@ -562,15 +580,15 @@ class StreamService : Service(), ConnectChecker {
      * 配置先落盘，稍后再触发重建，保证 HTTP 响应能先返回。
      */
     fun applySettingsJson(body: String): String {
-        val json = runCatching { JSONObject(body) }.getOrElse { return "请求体不是合法 JSON" }
+        val json = runCatching { JSONObject(body) }.getOrElse { return getString(R.string.svc_json_invalid) }
         var next = config
 
         json.optString("cameraId").takeIf { it.isNotEmpty() }?.let { id ->
             val sizes = CameraCaps.resolutions(this, id)
-            if (sizes.isEmpty()) return "不支持的相机：$id"
+            if (sizes.isEmpty()) return getString(R.string.svc_unknown_camera, id)
             val givesSize = json.has("width") || json.has("height")
             if (!givesSize && sizes.none { it.width == next.width && it.height == next.height }) {
-                return "该相机不支持当前分辨率 ${next.width}x${next.height}，请同时选择分辨率"
+                return getString(R.string.svc_res_unsupported_camera, next.width, next.height)
             }
             next = next.copy(cameraId = id)
         }
@@ -580,40 +598,40 @@ class StreamService : Service(), ConnectChecker {
             val h = json.optInt("height", next.height)
             if (w != next.width || h != next.height) {
                 val sizes = CameraCaps.resolutions(this, next.cameraId)
-                if (sizes.none { it.width == w && it.height == h }) return "不支持的分辨率：${w}x$h"
+                if (sizes.none { it.width == w && it.height == h }) return getString(R.string.svc_res_unsupported, w, h)
                 next = next.copy(width = w, height = h)
             }
         }
 
         if (json.has("fps")) {
             val fps = json.optInt("fps", next.fps)
-            if (fps !in 1..60) return "帧率需在 1–60 之间"
+            if (fps !in 1..60) return getString(R.string.svc_fps_range)
             val options = CameraCaps.fpsOptions(this, next.cameraId, next.width, next.height)
             if (options.isNotEmpty() && fps !in options) {
-                return "该分辨率不支持 ${fps}fps，可选：${options.joinToString(" / ")}"
+                return getString(R.string.svc_fps_unsupported, fps, options.joinToString(" / "))
             }
             next = next.copy(fps = fps)
         }
 
         if (json.has("bitrate")) {
             val bitrate = json.optInt("bitrate", next.bitrate)
-            if (bitrate !in 200_000..20_000_000) return "码率需在 200000–20000000 bps 之间"
+            if (bitrate !in 200_000..20_000_000) return getString(R.string.svc_bitrate_range)
             next = next.copy(bitrate = bitrate)
         }
 
         json.optString("codec").takeIf { it.isNotEmpty() }?.let { codec ->
             if (codec != StreamConfig.CODEC_H264 && codec != StreamConfig.CODEC_H265) {
-                return "编码格式只支持 H264 / H265"
+                return getString(R.string.svc_codec_invalid)
             }
             next = next.copy(codec = codec)
         }
 
         if (json.has("port")) {
             val port = json.optInt("port", next.port)
-            if (port !in 1024..65535) return "RTSP 端口需在 1024–65535 之间"
+            if (port !in 1024..65535) return getString(R.string.svc_rtsp_port_range)
             val webPort = httpPort
             if (webPort > 0 && port in webPort..(webPort + 2)) {
-                return "RTSP 端口不能与网页端口（$webPort）冲突"
+                return getString(R.string.svc_port_conflict, webPort)
             }
             next = next.copy(port = port)
         }
@@ -622,14 +640,14 @@ class StreamService : Service(), ConnectChecker {
 
         if (json.has("nightMode")) {
             val mode = json.optInt("nightMode", next.nightMode)
-            if (mode !in 0..2) return "夜景模式只能是 0（关闭）/ 1（标准）/ 2（增强）"
+            if (mode !in 0..2) return getString(R.string.svc_night_invalid)
             next = next.copy(nightMode = mode)
         }
 
         if (json.has("denoiseEnabled")) next = next.copy(denoiseEnabled = json.optBoolean("denoiseEnabled"))
         if (json.has("denoiseLevel")) {
             val level = json.optInt("denoiseLevel", next.denoiseLevel)
-            if (level !in 0..100) return "降噪强度需在 0–100 之间"
+            if (level !in 0..100) return getString(R.string.svc_denoise_range)
             next = next.copy(denoiseLevel = level)
         }
 
@@ -637,24 +655,24 @@ class StreamService : Service(), ConnectChecker {
         if (json.has("osdDate")) next = next.copy(osdDate = json.optBoolean("osdDate"))
         if (json.has("osdDateFormat")) {
             val format = json.optInt("osdDateFormat", next.osdDateFormat)
-            if (format !in 0..3) return "日期格式只能是 0–3"
+            if (format !in 0..3) return getString(R.string.svc_date_format_invalid)
             next = next.copy(osdDateFormat = format)
         }
         if (json.has("osdBattery")) next = next.copy(osdBattery = json.optBoolean("osdBattery"))
         if (json.has("osdBatteryIcon")) next = next.copy(osdBatteryIcon = json.optBoolean("osdBatteryIcon"))
         if (json.has("osdPosition")) {
             val position = json.optInt("osdPosition", next.osdPosition)
-            if (position !in 0..3) return "叠加位置只能是 0–3"
+            if (position !in 0..3) return getString(R.string.svc_position_invalid)
             next = next.copy(osdPosition = position)
         }
         if (json.has("osdRotation")) {
             val rotation = json.optInt("osdRotation", next.osdRotation)
-            if (rotation !in listOf(0, 90, 180, 270)) return "旋转角度只能是 0 / 90 / 180 / 270"
+            if (rotation !in listOf(0, 90, 180, 270)) return getString(R.string.svc_rotation_invalid)
             next = next.copy(osdRotation = rotation)
         }
         if (json.has("osdFlip")) {
             val flip = json.optInt("osdFlip", next.osdFlip)
-            if (flip !in 0..3) return "翻转只能是 0–3"
+            if (flip !in 0..3) return getString(R.string.svc_flip_invalid)
             next = next.copy(osdFlip = flip)
         }
 
@@ -687,7 +705,7 @@ class StreamService : Service(), ConnectChecker {
             )
             true
         } catch (t: Throwable) {
-            lastMessage = "前台服务启动失败：${t.message}"
+            lastMessage = getString(R.string.svc_fg_failed, t.message ?: "")
             push()
             false
         }
@@ -738,13 +756,21 @@ class StreamService : Service(), ConnectChecker {
             if (applied.nightMode == StreamConfig.NIGHT_STRONG && applied.fps > FpsRules.STRONG_NIGHT_FPS) {
                 applied = applied.copy(fps = FpsRules.STRONG_NIGHT_FPS)
             }
+            // 相机 AE 帧率范围可能低于配置值（配置表写 60、实际只支持 30）：
+            // 不拦下来时库会退回 15-15，画面反而比 30fps 更卡
+            val fpsOptions = CameraCaps.fpsOptions(this, applied.cameraId, applied.width, applied.height)
+            val maxSupported = fpsOptions.lastOrNull() ?: 0
+            if (maxSupported in 1 until applied.fps) {
+                Log.i(TAG, "fps ${applied.fps} not supported at ${applied.width}x${applied.height}, clamp to $maxSupported")
+                applied = applied.copy(fps = maxSupported)
+            }
             var prepared = runCatching { prepare(stream, applied) }.getOrDefault(false)
             if (!prepared && applied.fps > 30) {
                 applied = applied.copy(fps = 30)
                 prepared = runCatching { prepare(stream, applied) }.getOrDefault(false)
             }
             if (!prepared) {
-                fail("参数不被支持：${applied.resolutionText} @${applied.fps}fps")
+                fail(getString(R.string.svc_params_unsupported, applied.resolutionText, applied.fps))
                 return
             }
             effective = applied
@@ -771,7 +797,7 @@ class StreamService : Service(), ConnectChecker {
             startTicker()
             push()
         } catch (t: Throwable) {
-            fail("启动失败：${t.message}")
+            fail(getString(R.string.svc_start_failed, t.message ?: ""))
         }
     }
 
@@ -807,7 +833,7 @@ class StreamService : Service(), ConnectChecker {
         val current = runCatching { source.getCurrentCameraId() }.getOrNull()
         if (current == cameraId) return
         runCatching { source.openCameraId(cameraId) }
-            .onFailure { lastMessage = "切换摄像头失败：${it.message}" }
+            .onFailure { lastMessage = getString(R.string.svc_switch_camera_failed, it.message ?: "") }
     }
 
     private fun attachPreviewInternal() {
@@ -818,7 +844,7 @@ class StreamService : Service(), ConnectChecker {
         val width = if (previewWidth > 0) previewWidth else 1080
         val height = if (previewHeight > 0) previewHeight else 1920
         runCatching { stream.startPreview(surface, width, height) }
-            .onFailure { lastMessage = "预览启动失败：${it.message}" }
+            .onFailure { lastMessage = getString(R.string.svc_preview_failed, it.message ?: "") }
     }
 
     /**
@@ -864,7 +890,7 @@ class StreamService : Service(), ConnectChecker {
                 }.onFailure { Log.w(TAG, "requestStreaming failed: ${it.message}") }
             }
             ""
-        }.getOrElse { "操作失败：${it.message}" }
+        }.getOrElse { getString(R.string.svc_op_failed, it.message ?: "") }
     }
 
     private fun shutdown() {
@@ -1078,7 +1104,7 @@ class StreamService : Service(), ConnectChecker {
         message = lastMessage,
         lowPower = lowPower,
         resolution = effective.resolutionText,
-        fps = effective.fps
+            fps = effective.fps
     )
 
     private fun push() {
@@ -1093,9 +1119,9 @@ class StreamService : Service(), ConnectChecker {
 
     override fun onConnectionFailed(reason: String) {
         if (reason.contains("Server creation failed", ignoreCase = true)) {
-            fail("端口 ${config.port} 被占用")
+            fail(getString(R.string.svc_port_in_use, config.port))
         } else {
-            lastMessage = "连接失败：$reason"
+            lastMessage = getString(R.string.svc_connect_failed, reason)
             push()
         }
     }
@@ -1107,7 +1133,7 @@ class StreamService : Service(), ConnectChecker {
     override fun onDisconnect() = Unit
 
     override fun onAuthError() {
-        lastMessage = "鉴权失败"
+        lastMessage = getString(R.string.svc_auth_failed)
         push()
     }
 

@@ -44,7 +44,7 @@ open class DiagnoseActivity : AppCompatActivity() {
         val config = Prefs.load(this)
         val profile = DeviceProbe.collect(this, config.cameraId)
         val sizes = CameraCaps.resolutions(this, config.cameraId)
-        val result = Recommender.build(config, profile, sizes)
+        val result = Recommender.build(this, config, profile, sizes)
         recommendation = result
 
         renderProfile(profile)
@@ -85,15 +85,15 @@ open class DiagnoseActivity : AppCompatActivity() {
 
     private fun renderProfile(profile: DeviceProfile) {
         cardInfo.removeAllViews()
-        addRow(getString(R.string.info_soc), "${profile.soc} · ${profile.cores} 核")
+        addRow(getString(R.string.info_soc), "${profile.soc} · " + getString(R.string.core_count_fmt, profile.cores))
         addRow(getString(R.string.info_architecture), profile.abi)
         val ramGb = String.format(java.util.Locale.US, "%.1f GB", profile.ramMb / 1024.0)
         addRow(
             getString(R.string.info_ram),
-            if (profile.lowRam) "$ramGb（低内存）" else ramGb
+            if (profile.lowRam) ramGb + getString(R.string.low_ram_suffix) else ramGb
         )
-        addRow(getString(R.string.info_h264), profile.h264?.label ?: getString(R.string.unknown))
-        addRow(getString(R.string.info_h265), profile.h265?.label ?: getString(R.string.unknown))
+        addRow(getString(R.string.info_h264), profile.h264?.label(this) ?: getString(R.string.unknown))
+        addRow(getString(R.string.info_h265), profile.h265?.label(this) ?: getString(R.string.unknown))
         addRow(
             getString(R.string.info_camera),
             "${profile.cameraMaxSize.width}x${profile.cameraMaxSize.height} · ${profile.cameraMaxFps}fps"

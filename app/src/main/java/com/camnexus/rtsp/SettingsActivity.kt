@@ -13,6 +13,8 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.appcompat.widget.SwitchCompat
@@ -48,6 +50,7 @@ open class SettingsActivity : AppCompatActivity() {
     private lateinit var txtHttpUrl: TextView
     private lateinit var txtHttpUser: TextView
     private lateinit var txtHttpPass: TextView
+    private lateinit var txtLanguage: TextView
     private lateinit var switchOsd: SwitchCompat
     private lateinit var switchOsdDate: SwitchCompat
     private lateinit var switchOsdBattery: SwitchCompat
@@ -183,6 +186,8 @@ open class SettingsActivity : AppCompatActivity() {
         rowUser.setOnClickListener { editUser() }
         rowPass.setOnClickListener { editPassword() }
         rowHttpPort.setOnClickListener { editHttpPort() }
+        txtLanguage = findViewById(R.id.txtLanguage)
+        findViewById<View>(R.id.rowLanguage).setOnClickListener { pickLanguage() }
         rowHttpUser.setOnClickListener { editHttpUser() }
         rowHttpPass.setOnClickListener { editHttpPassword() }
 
@@ -304,6 +309,19 @@ open class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun isEnglish(): Boolean =
+        resources.configuration.locales.get(0)?.language == "en"
+
+    private fun pickLanguage() {
+        val options = listOf(getString(R.string.language_zh), getString(R.string.language_en))
+        val selected = if (isEnglish()) 1 else 0
+        Ui.picker(this, getString(R.string.language_title), options, selected) { index ->
+            val tag = if (index == 1) "en" else "zh-CN"
+            Prefs.setLanguage(this, tag)
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
+        }
+    }
+
     private fun render() {
         val config = Prefs.load(this)
         txtCodec.text = config.codecLabel
@@ -324,10 +342,11 @@ open class SettingsActivity : AppCompatActivity() {
         txtEncoderInfo.text = if (codecInfo == null) {
             getString(R.string.encoder_none)
         } else {
-            getString(R.string.encoder_info_fmt, codecInfo.label)
+            getString(R.string.encoder_info_fmt, codecInfo.label(this))
         }
         txtPort.text = config.port.toString()
         txtHttpPort.text = config.httpPort.toString()
+        txtLanguage.text = getString(if (isEnglish()) R.string.language_en else R.string.language_zh)
         val localIp = NetInfo.localIpv4()
         txtHttpUrl.text = if (localIp.isEmpty()) {
             getString(R.string.http_enable_hint)
@@ -335,9 +354,9 @@ open class SettingsActivity : AppCompatActivity() {
             getString(R.string.http_url_hint, "http://$localIp:${config.httpPort}")
         }
         txtHttpUser.text = config.httpUser
-        txtHttpPass.text = if (config.httpPass.isEmpty()) "未设置" else "•".repeat(config.httpPass.length.coerceAtMost(10))
+        txtHttpPass.text = if (config.httpPass.isEmpty()) getString(R.string.not_set) else "•".repeat(config.httpPass.length.coerceAtMost(10))
         txtUser.text = config.username
-        txtPass.text = if (config.password.isEmpty()) "未设置" else "•".repeat(config.password.length.coerceAtMost(10))
+        txtPass.text = if (config.password.isEmpty()) getString(R.string.not_set) else "•".repeat(config.password.length.coerceAtMost(10))
 
         suppress = true
         switchPower.isChecked = config.powerSaving

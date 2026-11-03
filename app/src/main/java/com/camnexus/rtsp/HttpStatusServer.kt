@@ -30,6 +30,7 @@ class HttpStatusServer(
     private val applySettings: (String) -> String,
     private val requestStream: (Boolean) -> String,
     private val setTorchMinutes: (Int) -> String,
+    private val appVersion: () -> String,
     private val logoBytes: () -> ByteArray?
 ) : NanoHTTPD(port) {
 
@@ -37,7 +38,7 @@ class HttpStatusServer(
         return try {
             when {
                 session.uri == "/api/login" && session.method == Method.POST -> login(session)
-                session.uri == "/" -> page()
+                session.uri == "/" -> page(session)
                 session.uri == "/logo.png" -> logo()
                 !checkSession(session) -> unauthorizedJson()
                 session.uri == "/api/status" -> json(statusJson())
@@ -133,8 +134,16 @@ class HttpStatusServer(
 
     // ---------------- 其它接口 ----------------
 
-    private fun page(): Response =
-        newFixedLengthResponse(Response.Status.OK, "text/html; charset=utf-8", PAGE)
+    private fun page(session: IHTTPSession): Response {
+        val lang = session.headers["cookie"].orEmpty()
+            .split(";")
+            .map { it.trim() }
+            .firstOrNull { it.startsWith("cnx_lang=") }
+            ?.substringAfter("cnx_lang=")
+        val html = (if (lang == "en") PAGE_EN else PAGE)
+            .replace("__APP_VERSION__", runCatching { appVersion() }.getOrDefault(""))
+        return newFixedLengthResponse(Response.Status.OK, "text/html; charset=utf-8", html)
+    }
 
     private fun logo(): Response {
         val bytes = runCatching { logoBytes() }.getOrNull()
@@ -228,6 +237,10 @@ class HttpStatusServer(
         object-fit:contain;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
   h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.2px}
   .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .headRight{display:flex;align-items:center;gap:12px}
+  .lang{color:var(--muted);text-decoration:none;font-size:12px;border:1px solid var(--line);
+    border-radius:999px;padding:6px 12px;letter-spacing:.5px}
+  .lang:hover{color:var(--text);border-color:var(--text)}
   .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:99px;
         background:rgba(61,220,132,.10);border:1px solid rgba(61,220,132,.28);
         color:var(--accent);font-size:13px;font-weight:600;white-space:nowrap}
@@ -316,7 +329,10 @@ class HttpStatusServer(
         <div class="sub" id="sub">读取中…</div>
       </div>
     </div>
-    <div class="pill" id="pill"><span class="dot"></span><span id="pillText">连接中</span></div>
+    <div class="headRight">
+      <a class="lang" href="#" onclick="toggleLang();return false;">EN</a>
+      <div class="pill" id="pill"><span class="dot"></span><span id="pillText">连接中</span></div>
+    </div>
   </header>
 
   <section class="panel" style="margin-bottom:14px">
@@ -429,7 +445,7 @@ class HttpStatusServer(
     <div class="msg" id="msg"></div>
   </div>
 
-  <div class="foot" id="foot">CamNexus RTSP</div>
+  <div class="foot" id="foot">CamNexus RTSP · v__APP_VERSION__</div>
 </div>
 
 <div class="login" id="login">
@@ -746,9 +762,117 @@ el('lgUser').addEventListener('keydown', function (e) { if (e.key === 'Enter') e
   loadStatus();
   setInterval(loadStatus, 2000);
 })();
+function toggleLang(){
+  var en = document.documentElement.lang === 'en';
+  document.cookie = 'cnx_lang=' + (en ? 'zh' : 'en') + ';path=/;max-age=31536000';
+  location.reload();
+}
 </script>
 </body>
 </html>
         """.trimIndent()
+
+    /**
+     * 网页控制台的中英文切换：服务端按 cookie 输出英文版。
+     * 只翻译用户可见文案，注释与代码保持不变。
+     */
+    private val PAGE_I18N = linkedMapOf(
+        "RTSP 推流" to "RTSP stream",
+        "RTSP 端口" to "RTSP port",
+        "增强夜景会强制降到 15fps" to "Enhanced night mode forces 15 fps",
+        "修改后播放器需用新端口重连" to "Players must reconnect on the new port",
+        "无人观看 60 秒后自动降档" to "Downgrades after 60s with no viewers",
+        "闲置超过 15 分钟会自动退出，需要重新登录" to "Signs out after 15 minutes of inactivity",
+        "增强（提亮 + 曝光 + 15fps）" to "Enhanced (brighter + exposure + 15 fps)",
+        "已停止（网页可随时开启）" to "Stopped (can be started from the web)",
+        "已应用，推流将在 1 秒内重启" to "Applied; streaming restarts within a second",
+        "长时间开启会增加机身温度，缩短 LED 寿命" to "Long use increases heat and shortens LED life",
+        "会话已过期，请重新登录" to "Session expired, please sign in again",
+        "正在启动推流…" to "Starting stream…",
+        "正在停止推流…" to "Stopping stream…",
+        "加载配置失败：" to "Failed to load settings: ",
+        "登录 CamNexus" to "Sign in to CamNexus",
+        "读取中…" to "Loading…",
+        "连接中" to "Connecting",
+        "连接失败" to "Connection failed",
+        "标准（提亮）" to "Standard (brighter)",
+        "保存并应用" to "Save & apply",
+        "夜景与降噪" to "Night mode & denoise",
+        "夜景模式" to "Night mode",
+        "画面叠加" to "Overlay",
+        "显示叠加" to "Show overlay",
+        "显示图标" to "Show icon",
+        "日期时间" to "Date & time",
+        "省电模式" to "Power saving",
+        "配置码率" to "Configured bitrate",
+        "实测码率" to "Measured bitrate",
+        "请求失败：" to "Request failed: ",
+        "登录失败：" to "Sign-in failed: ",
+        "失败：" to "Failed: ",
+        "正在应用…" to "Applying…",
+        "左上角" to "Top left",
+        "右上角" to "Top right",
+        "左下角" to "Bottom left",
+        "右下角" to "Bottom right",
+        "不翻转" to "None",
+        "水平翻转" to "Horizontal",
+        "垂直翻转" to "Vertical",
+        "水平+垂直" to "Horizontal + vertical",
+        "分辨率" to "Resolution",
+        "编码格式" to "Codec",
+        "帧率" to "Frame rate",
+        "码率" to "Bitrate",
+        "相机" to "Camera",
+        "画质" to "Video",
+        "运行" to "Runtime",
+        "补光灯" to "Flashlight",
+        "客户端" to "Viewers",
+        "已发送" to "Sent",
+        "已运行 " to "up ",
+        "网页端口 " to "web port ",
+        "推流中" to "Live",
+        "运行中" to "Running",
+        "待机" to "Idle",
+        "空闲" to "Idle",
+        "标准" to "Standard",
+        "增强" to "Enhanced",
+        "开启" to "On",
+        "叠加" to "Overlay",
+        "夜景" to "Night",
+        "降噪" to "Denoise",
+        "电量" to "Battery",
+        "位置" to "Position",
+        "登录" to "Sign in",
+        "账号" to "Username",
+        "密码" to "Password",
+        "关闭" to "Off",
+        "编码" to "Codec",
+        "开 " to "On ",
+        "1 分钟" to "1 min",
+        "5 分钟" to "5 min",
+        "10 分钟" to "10 min",
+        "20 分钟" to "20 min",
+        "30 分钟" to "30 min",
+        "60 分钟" to "60 min",
+        " 时 " to " h ",
+        " 分 " to " m ",
+        " 分" to " m",
+        " 秒" to " s",
+        "（配置 " to " (configured ",
+        "）" to ")",
+    ).entries.sortedByDescending { it.key.length }.associate { it.key to it.value }
+
+    private val PAGE_EN: String by lazy { localizePage(PAGE) }
+
+    private fun localizePage(zh: String): String {
+        var text = zh.replace("<html lang=\"zh-CN\">", "<html lang=\"en\">")
+        for ((cn, en) in PAGE_I18N) {
+            if (cn == "READ_ME") continue
+            text = text.replace(cn, en)
+        }
+        // 英文页面的切换按钮显示“中文”，点一下切回中文
+        return text.replace(">EN</a>", ">中文</a>")
+    }
+
     }
 }

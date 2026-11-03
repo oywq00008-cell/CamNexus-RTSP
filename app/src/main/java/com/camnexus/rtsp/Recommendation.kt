@@ -1,5 +1,6 @@
 ﻿package com.camnexus.rtsp
 
+import android.content.Context
 import android.util.Size
 import java.util.Locale
 
@@ -14,7 +15,7 @@ data class Recommendation(
  */
 object Recommender {
 
-    fun build(current: StreamConfig, profile: DeviceProfile, sizes: List<Size>): Recommendation {
+    fun build(context: Context, current: StreamConfig, profile: DeviceProfile, sizes: List<Size>): Recommendation {
         val reasons = mutableListOf<String>()
         val hwEncoder = profile.h264?.hardware == true
 
@@ -23,26 +24,26 @@ object Recommender {
             current.codec == StreamConfig.CODEC_H265 && profile.h265?.hardware == true ->
                 StreamConfig.CODEC_H265
             current.codec == StreamConfig.CODEC_H265 -> {
-                reasons += "本机没有硬件 H.265 编码器，已改回 H.264"
+                reasons += context.getString(R.string.rec_no_hw_h265)
                 StreamConfig.CODEC_H264
             }
             else -> StreamConfig.CODEC_H264
         }
         if (codec == StreamConfig.CODEC_H265) {
-            reasons += "H.265 硬编可用，同画质体积约省 30%"
+            reasons += context.getString(R.string.rec_hw_h265_ok)
         }
 
         // 2. 编码器与内存
         when {
-            profile.h264 == null -> reasons += "没有找到 H.264 编码器，只能尝试软件编码"
-            hwEncoder -> reasons += "检测到硬件编码器（${profile.h264.name}）"
-            else -> reasons += "只有软件编码器（${profile.h264.name}），分辨率压在 720p 以内"
+            profile.h264 == null -> reasons += context.getString(R.string.rec_no_h264)
+            hwEncoder -> reasons += context.getString(R.string.rec_hw_encoder, profile.h264.name)
+            else -> reasons += context.getString(R.string.rec_sw_encoder, profile.h264.name)
         }
         val ramGb = String.format(Locale.US, "%.1f", profile.ramMb / 1024.0)
         when {
-            profile.lowRam -> reasons += "内存约 $ramGb GB，属于低内存设备"
-            hwEncoder && profile.ramMb >= 4096 -> reasons += "内存约 $ramGb GB，足够跑 1080p"
-            else -> reasons += "内存约 $ramGb GB"
+            profile.lowRam -> reasons += context.getString(R.string.rec_low_ram, ramGb)
+            hwEncoder && profile.ramMb >= 4096 -> reasons += context.getString(R.string.rec_ram_ok, ramGb)
+            else -> reasons += context.getString(R.string.rec_ram, ramGb)
         }
 
         // 3. 分辨率：相机 / 编码器 / 内存三道约束取最小
@@ -60,9 +61,9 @@ object Recommender {
             ?: Size(1280, 720)
 
         reasons += when {
-            size.width >= 1920 -> "推荐 1080p：编码器和内存都够用"
-            size.width >= 1280 -> "推荐 720p：兼顾画质与稳定性"
-            else -> "推荐 ${size.width}x${size.height}：更高分辨率在这台设备上不稳"
+            size.width >= 1920 -> context.getString(R.string.rec_1080p)
+            size.width >= 1280 -> context.getString(R.string.rec_720p)
+            else -> context.getString(R.string.rec_custom, size.width, size.height)
         }
 
         // 4. 帧率：相机上限、编码器上限、30 取最小
@@ -85,8 +86,13 @@ object Recommender {
         val codecFactor = if (codec == StreamConfig.CODEC_H265) 0.7 else 1.0
         val bitrate = ((base * netFactor * codecFactor) / 100_000).toInt() * 100_000
 
-        reasons += "网络：${profile.wifiBand}，链路 ${profile.wifiLinkMbps}Mbps，" +
-            "信号 ${profile.wifiRssi}dBm → 码率系数 ${String.format(Locale.US, "%.2f", netFactor)}"
+        reasons += context.getString(
+            R.string.rec_network,
+            profile.wifiBand,
+            profile.wifiLinkMbps,
+            profile.wifiRssi,
+            String.format(Locale.US, "%.2f", netFactor)
+        )
 
         val config = current.copy(
             width = size.width,

@@ -14,7 +14,8 @@ data class CodecCap(
     val maxHeight: Int,
     val maxFps: Int
 ) {
-    val label: String get() = (if (hardware) "硬件 · " else "软件 · ") + name
+    fun label(context: Context): String =
+        context.getString(if (hardware) R.string.probe_hw_prefix else R.string.probe_sw_prefix) + name
 }
 
 data class DeviceProfile(
@@ -89,13 +90,13 @@ object DeviceProbe {
     @Suppress("DEPRECATION")
     private fun wifiInfo(context: Context): Triple<String, Int, Int> {
         val wm = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
-            ?: return Triple("未知", 0, 0)
-        val info = runCatching { wm.connectionInfo }.getOrNull() ?: return Triple("未知", 0, 0)
+            ?: return Triple(context.getString(R.string.unknown), 0, 0)
+        val info = runCatching { wm.connectionInfo }.getOrNull() ?: return Triple(context.getString(R.string.unknown), 0, 0)
         val freq = info.frequency
         val band = when {
             freq >= 4900 -> "5GHz"
             freq in 2400..2500 -> "2.4GHz"
-            else -> "未知"
+            else -> context.getString(R.string.unknown)
         }
         return Triple(band, info.linkSpeed, info.rssi)
     }

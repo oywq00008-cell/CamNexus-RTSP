@@ -33,7 +33,8 @@ it directly, with no PC relay and nothing uploaded to the cloud.
 - H.264 and H.265, with hardware encoding preferred and a software fallback
 - One-tap portrait / landscape UI switch; the stream follows the interface orientation
 - Torch with 1–60 minute timer, turns off automatically
-- Night enhancement, adjustable denoise, and OSD overlay (time, battery, position, rotation, flip)
+- Night enhancement and adjustable denoise (off by default); OSD overlay with time, battery, position, rotation and flip
+- 4K is offered only when the device can actually keep up (camera FPS ranges + encoder achievable rate); capable phones can also select 4K60
 - Multi-camera phones are detected automatically and labeled as ultra-wide / main / telephoto;
   duplicate logical cameras are merged
 
@@ -44,6 +45,11 @@ it directly, with no PC relay and nothing uploaded to the cloud.
 - Optional authentication (username and password), enabled by default
 - Configurable port, default 8554
 - Built-in web console (off by default): open `http://<phone-ip>:8080` to view status, edit settings, and toggle streaming
+
+### Language
+
+- The app and the web console both support **简体中文 / English**
+- Switch the app language at the bottom of Settings (persisted); the web choice is stored per browser
 
 ### Running unattended
 
@@ -93,6 +99,7 @@ The default username and password are both `camnexus`; change them in Settings.
 | Torch | Off / 1 / 5 / 10 / 20 / 30 / 60 minutes, with a heat and LED-lifetime warning for long runs |
 | Web console | Browser access for status and settings, off by default |
 | OSD | Time, battery, position, rotation, flip |
+| Language | 简体中文 / English, switch at the bottom of Settings |
 
 ## Requirements
 

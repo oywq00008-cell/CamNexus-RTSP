@@ -872,6 +872,42 @@
                         app:tint="@color/text_tertiary" />
                 </LinearLayout>
             </LinearLayout>
+
+        <LinearLayout
+            style="@style/Widget.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/rowLanguage"
+                style="@style/Widget.Row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    style="@style/Text.RowLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/language_title" />
+
+                <TextView
+                    android:id="@+id/txtLanguage"
+                    style="@style/Text.RowValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginLeft="8dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_tertiary" />
+            </LinearLayout>
+        </LinearLayout>
+
 <TextView
                 android:id="@+id/txtVersion"
                 android:layout_width="match_parent"

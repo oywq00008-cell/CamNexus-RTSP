@@ -1,4 +1,4 @@
-﻿package com.camnexus.rtsp
+package com.camnexus.rtsp
 
 import android.content.Context
 import android.graphics.SurfaceTexture
@@ -21,6 +21,8 @@ object CameraCaps {
 
     private const val DEFAULT_FPS = 30
     private const val MAX_FPS = 60
+    /** 低于该帧率的尺寸不提供（编码器实际吞吐不足） */
+    private const val MIN_USABLE_FPS = 24
     private const val FULL_FRAME_DIAGONAL_MM = 43.27f
     private val CANDIDATE_FPS = listOf(15, 20, 24, 25, 30, 50, 60)
 
@@ -92,23 +94,27 @@ object CameraCaps {
                     { if (it.equivalent > 0f) it.equivalent else 999f }
                 )
             )
-            .map { CameraEntry(it.id, labelOf(it.facing, it.equivalent, it.id)) }
+            .map { CameraEntry(it.id, labelOf(context, it.facing, it.equivalent, it.id)) }
     }
 
-    private fun labelOf(facing: Int, equivalent: Float, id: String): String {
-        val facingText = when (facing) {
-            CameraCharacteristics.LENS_FACING_FRONT -> "前置"
-            CameraCharacteristics.LENS_FACING_BACK -> "后置"
-            else -> "外接"
-        }
-        if (equivalent <= 0f) return "$facingText（ID $id）"
-        val lens = when {
-            equivalent < 20f -> "超广角"
-            equivalent <= 40f -> "主摄"
-            equivalent <= 90f -> "长焦"
-            else -> "超长焦"
-        }
-        return "$facingText · $lens ${equivalent.roundToInt()}mm（ID $id）"
+    private fun labelOf(context: Context, facing: Int, equivalent: Float, id: String): String {
+        val facingText = context.getString(
+            when (facing) {
+                CameraCharacteristics.LENS_FACING_FRONT -> R.string.cam_front
+                CameraCharacteristics.LENS_FACING_BACK -> R.string.cam_back
+                else -> R.string.cam_external
+            }
+        )
+        if (equivalent <= 0f) return context.getString(R.string.cam_id_fmt, facingText, id)
+        val lens = context.getString(
+            when {
+                equivalent < 20f -> R.string.lens_ultrawide
+                equivalent <= 40f -> R.string.lens_main
+                equivalent <= 90f -> R.string.lens_tele
+                else -> R.string.lens_supertele
+            }
+        )
+        return context.getString(R.string.cam_lens_fmt, facingText, lens, equivalent.roundToInt(), id)
     }
 
     /**
@@ -123,7 +129,7 @@ object CameraCaps {
             ?: return emptyList()
         val sizes = runCatching { map.getOutputSizes(SurfaceTexture::class.java) }
             .getOrNull() ?: return emptyList()
-        return sizes
+        val all = sizes
             .asSequence()
             .filter { it.width >= 320 && it.height >= 240 }
             .filter { it.width <= 3840 && it.height <= 2160 }
@@ -132,10 +138,31 @@ object CameraCaps {
             .distinct()
             .sortedByDescending { it.width * it.height }
             .toList()
+
+        // 相机 HAL 常把 4K 写进配置表却跑不动：同时用相机帧率范围和编码器
+        // 「实际可达帧率」做上限，低于 24fps 的尺寸不作为选项。
+        val aeRanges = chars.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES)
+        val aeMax = aeRanges?.maxOfOrNull { it.upper } ?: DEFAULT_FPS
+        val mime = if (Codecs.has(Codecs.MIME_H265)) Codecs.MIME_H265 else Codecs.MIME_H264
+        val usable = all.filter { size ->
+            val duration = runCatching {
+                map.getOutputMinFrameDuration(SurfaceTexture::class.java, size)
+            }.getOrDefault(0L)
+            val cameraMax = if (duration > 0L) minOf((1_000_000_000L / duration).toInt(), aeMax) else aeMax
+            val encoderMax = Codecs.achievableFps(mime, true, size.width, size.height)
+            val limit = if (encoderMax > 0) minOf(cameraMax, encoderMax) else cameraMax
+            limit >= MIN_USABLE_FPS
+        }
+        return usable.ifEmpty { all }
     }
 
     /**
-     * 该摄像头在该尺寸下能跑的最高帧率（由 minFrameDuration 反算）。
+     * 该摄像头在该尺寸下能跑的最高帧率。
+     *
+     * 除了 SCALER_STREAM_CONFIGURATION_MAP 的 minFrameDuration，还必须受
+     * CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES 限制：部分机型（如三星 Exynos）
+     * 的 720p 在配置表里写着 60fps，但普通预览通路的 AE 帧率范围最高只有 30，
+     * 强行选 60 会让相机退回 15-15，反而比 30 更卡。
      */
     fun maxFps(context: Context, cameraId: String, width: Int, height: Int): Int {
         val cm = manager(context) ?: return DEFAULT_FPS
@@ -146,13 +173,28 @@ object CameraCaps {
         val durationNanos = runCatching {
             map.getOutputMinFrameDuration(SurfaceTexture::class.java, Size(width, height))
         }.getOrDefault(0L)
-        if (durationNanos <= 0L) return DEFAULT_FPS
-        return (1_000_000_000L / durationNanos).toInt().coerceIn(1, 120)
+        val streamMax = if (durationNanos <= 0L) DEFAULT_FPS else (1_000_000_000L / durationNanos).toInt()
+        val ranges = chars.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES)
+        if (ranges != null && ranges.isNotEmpty()) {
+            // 相机能跑多高帧率以 AE 可用范围为准：部分机型（如小米）把 4K60
+            // 的 minFrameDuration 误报为 30fps，按它算会白白丢掉 60 选项
+            return ranges.maxOf { it.upper }.coerceIn(1, 120)
+        }
+        return streamMax.coerceIn(1, 120)
     }
 
     /** 帧率档位：只给出该摄像头在该尺寸下真正支持的。 */
     fun fpsOptions(context: Context, cameraId: String, width: Int, height: Int): List<Int> {
         val max = maxFps(context, cameraId, width, height).coerceAtMost(MAX_FPS)
+        val chars = runCatching { manager(context)?.getCameraCharacteristics(cameraId) }.getOrNull()
+        val ranges = chars?.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES)
+        val fromRanges = ranges
+            ?.map { it.upper }
+            ?.distinct()
+            ?.filter { it in 15..max }
+            ?.sorted()
+            .orEmpty()
+        if (fromRanges.isNotEmpty()) return fromRanges
         val supported = CANDIDATE_FPS.filter { it <= max }
         return supported.ifEmpty { listOf(max.coerceAtLeast(1)) }
     }
